@@ -801,11 +801,28 @@ LRESULT CConEmuChild::BackWndProc(HWND hWnd, UINT messg, WPARAM wParam, LPARAM l
 			gVConBkMap.Set(hWnd, pVCon);
 		if (const auto theme = gpConEmu->opt.WindowTheme.GetStr())
 			gpConEmu->SetWindowTheme(hWnd, theme, nullptr);
+		else if (global::g_darkModeSupported)
+		{
+			AllowDarkModeForWindow(hWnd, global::g_darkModeEnabled);
+			SetPropW(hWnd, L"ConEmu.DarkScrollBar", reinterpret_cast<HANDLE>(global::g_darkModeEnabled ? 2 : 1));
+			gpConEmu->SetWindowTheme(hWnd, global::g_darkModeEnabled ? L"DarkMode_Explorer" : nullptr, nullptr);
+		}
 	}
 	else if (hWnd != ghBkInDestroing)
 	{
 		if (!gVConBkMap.Get(hWnd, &pVCon) || !guard.Attach(pVCon))
 			pVCon = nullptr;
+	}
+
+	if (messg == WM_THEMECHANGED && global::g_darkModeSupported && !gpConEmu->opt.WindowTheme.GetStr())
+	{
+		const HANDLE state = reinterpret_cast<HANDLE>(global::g_darkModeEnabled ? 2 : 1);
+		if (GetPropW(hWnd, L"ConEmu.DarkScrollBar") != state)
+		{
+			SetPropW(hWnd, L"ConEmu.DarkScrollBar", state);
+			AllowDarkModeForWindow(hWnd, global::g_darkModeEnabled);
+			gpConEmu->SetWindowTheme(hWnd, global::g_darkModeEnabled ? L"DarkMode_Explorer" : nullptr, nullptr);
+		}
 	}
 
 	if (messg == WM_SYSCHAR)
@@ -1053,15 +1070,6 @@ LRESULT CConEmuChild::OnPaintGaps(HDC hdc)
 		return 0;
 	}
 
-	int nColorIdx = RELEASEDEBUGTEST(0/*Black*/,1/*Blue*/);
-	const auto& clrPalette = VCon->GetColors();
-
-	CRealConsole* pRCon = VCon->RCon();
-	if (pRCon)
-	{
-		nColorIdx = pRCon->GetDefaultBackColorIdx();
-	}
-
 	#ifdef _DEBUG
 	wchar_t szPos[80]; RECT rcScreen = {}; GetWindowRect(mh_WndBack, &rcScreen);
 	swprintf_c(szPos, L"PaintGaps VCon[%i] at {%i,%i}-{%i,%i} screen coords", mp_VCon->Index(), LOGRECTCOORDS(rcScreen));
@@ -1086,7 +1094,8 @@ LRESULT CConEmuChild::OnPaintGaps(HDC hdc)
 		BeginPaint(mh_WndBack, &ps);
 	}
 
-	const auto clrBack = clrPalette[nColorIdx];
+	VCon->GetColors();
+	const auto clrBack = VCon->GetTerminalBackground();
 	if (VCon->drawImage)
 	{
 		RECT rcPaint = {};
@@ -1116,7 +1125,8 @@ LRESULT CConEmuChild::OnPaintGaps(HDC hdc)
 	{
 		if (!hdc)
 		{
-			FillRect(ps.hdc, &ps.rcPaint, hBrush);
+			if (!VCon->PaintTerminalBackdropPadding(ps.hdc, ps.rcPaint))
+				FillRect(ps.hdc, &ps.rcPaint, hBrush);
 		}
 		else
 		{

@@ -450,6 +450,7 @@ bool CFrameHolder::OnNcUahDrawCaption(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	if (gpSet->isLogging(2)) LogString(L"WM_NCUAHDRAWCAPTION - begin");
 	MSetter inNcPaint(&mn_InNcPaint);
 	lResult = DoDwmMessage(hWnd, uMsg, wParam, lParam);
+	gpConEmu->RefreshTitleBarThemeColor(hWnd);
 	if (gpSet->isLogging(2)) LogString(L"WM_NCUAHDRAWCAPTION - end");
 	return true;
 }
@@ -469,6 +470,7 @@ bool CFrameHolder::OnDwmCompositionChanged(HWND hWnd, UINT uMsg, WPARAM wParam, 
 	DBGFUNCTION("WM_DWMCOMPOSITIONCHANGED");
 	if (gpSet->isLogging(2)) LogString(L"WM_DWMCOMPOSITIONCHANGED - begin");
 	lResult = DoDwmMessage(hWnd, uMsg, wParam, lParam);
+	gpConEmu->UpdateWindowBackdrop(true);
 	if (gpSet->isLogging(2)) LogString(L"WM_DWMCOMPOSITIONCHANGED - end");
 	return true;
 }

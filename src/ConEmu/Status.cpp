@@ -42,6 +42,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../common/WUser.h"
 
 #include "ConEmu.h"
+#include "DarkMode.h"
 #include "Inside.h"
 #include "Menu.h"
 #include "Options.h"
@@ -483,6 +484,15 @@ void CStatus::PaintStatus(HDC hPaint, LPRECT prcStatus /*= nullptr*/)
 	COLORREF crText = lbSysColor ? GetSysColor(COLOR_BTNTEXT) : lbFade ? gpSet->GetFadeColor(gpSet->nStatusBarLight) : gpSet->nStatusBarLight;
 	COLORREF crDash = lbSysColor ? GetSysColor(COLOR_3DSHADOW) : lbFade ? gpSet->GetFadeColor(gpSet->nStatusBarDark) : gpSet->nStatusBarDark;
 
+	if (gpConEmu->IsWindowBackdropActive())
+	{
+		crBack = RGB(0, 0, 0);
+		crText = global::g_darkModeEnabled ? DarkMode::Text : GetSysColor(COLOR_WINDOWTEXT);
+		crDash = global::g_darkModeEnabled ? RGB(105, 105, 105) : GetSysColor(COLOR_3DSHADOW);
+	}
+	else if (DarkMode::GetConsoleChromeColors(crBack, crText))
+		crDash = CDwmHelper::BlendColors(crBack, crText, 30);
+
 	HBRUSH hBr = CreateSolidBrush(crBack);
 	//HPEN hLight = CreatePen(PS_SOLID, 1, GetSysColor(COLOR_3DSHADOW));
 	//HPEN hShadow = CreatePen(PS_SOLID, 1, GetSysColor(COLOR_3DDKSHADOW));
@@ -491,6 +501,8 @@ void CStatus::PaintStatus(HDC hPaint, LPRECT prcStatus /*= nullptr*/)
 
 	LOGFONT lf = {};
 	lf.lfWeight = FW_DONTCARE;
+	if (gpConEmu->IsWindowBackdropActive())
+		lf.lfQuality = ANTIALIASED_QUALITY;
 	lf.lfCharSet = gpSet->nStatusFontCharSet;
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_SWISS;
 	wcscpy_c(lf.lfFaceName, gpSet->sStatusFontFace);

@@ -6090,6 +6090,11 @@ LRESULT CConEmuMain::OnCreate(HWND hWnd, LPCREATESTRUCT lpCreate)
 	if (const auto theme = gpConEmu->opt.WindowTheme.GetStr())
 		gpConEmu->SetWindowTheme(hWnd, theme, nullptr);
 
+	// Theme the visible main window before its first paint, not ghWndApp
+	// (the off-screen taskbar owner window).
+	RefreshTitleBarThemeColor(hWnd);
+	UpdateWindowBackdrop();
+
 	RECT rcWndMin = {WINDOWS_ICONIC_POS, WINDOWS_ICONIC_POS, WINDOWS_ICONIC_POS+160, WINDOWS_ICONIC_POS+16};
 	SizeInfo::RequestRect(rcWndMin);
 
@@ -11957,6 +11962,9 @@ void CConEmuMain::OnTimer_Main(CVirtualConsole* pVCon)
 		CheckTopMostState();
 	}
 
+	UpdateWindowBackdrop();
+	if (UpdateConsoleCaptionColors(ghWnd))
+		mp_Status->InvalidateStatusBar();
 	mp_Status->OnTimer();
 
 	CheckProcesses();
@@ -13309,6 +13317,11 @@ LRESULT CConEmuMain::WndProc(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam
 		case WM_THEMECHANGED:
 		case WM_SYSCOLORCHANGE:
 		case WM_DWMCOLORIZATIONCOLORCHANGED:
+			if (messg == WM_THEMECHANGED)
+			{
+				RefreshTitleBarThemeColor(hWnd);
+				UpdateWindowBackdrop(true);
+			}
 			if (mp_TabBar)
 				mp_TabBar->Invalidate();
 			result = ::DefWindowProc(hWnd, messg, wParam, lParam);
@@ -13349,6 +13362,14 @@ LRESULT CConEmuMain::WndProc(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam
 				&& gpSet->AutoReloadEnvironment && !gpConEmu->opt.NoAutoEnvReload)
 			{
 				ReloadEnvironmentVariables();
+			}
+
+			if (global::g_darkModeSupported
+				&& (IsColorSchemeChangeMessage(lParam) || wParam == SPI_SETHIGHCONTRAST))
+			{
+				RefreshTitleBarThemeColor(hWnd);
+				if (_FlushMenuThemes)
+					_FlushMenuThemes();
 			}
 		} break;
 
