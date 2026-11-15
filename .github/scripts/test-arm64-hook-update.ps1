@@ -10,7 +10,11 @@ Expand-Archive -LiteralPath $Archive -DestinationPath $root
 Expand-Archive -LiteralPath $Archive -DestinationPath $candidate
 $gui = Join-Path $root 'ConEmu64.exe'
 $version = Get-HookBuild $gui
-$validHash = (Get-FileHash -LiteralPath $Archive).Hash
+$validHash = (Microsoft.PowerShell.Utility\Get-FileHash -LiteralPath $Archive).Hash
+
+function Get-FileHash {
+    throw 'Get-FileHash is intentionally unavailable to the installer in this test.'
+}
 
 # Give the fixture an older Windows file version by editing its VS_FIXEDFILEINFO.
 $bytes = [IO.File]::ReadAllBytes($gui)
@@ -34,7 +38,7 @@ foreach ($file in $sentinels) {
 }
 
 function Get-State([string]$Directory, [string[]]$Files) {
-    ($Files | ForEach-Object { (Get-FileHash -LiteralPath (Join-Path $Directory $_)).Hash }) -join ','
+    ($Files | ForEach-Object { (Microsoft.PowerShell.Utility\Get-FileHash -LiteralPath (Join-Path $Directory $_)).Hash }) -join ','
 }
 
 function Test-ExpectedFailure([scriptblock]$Operation, [string]$Pattern) {

@@ -111,10 +111,13 @@ function Install-HookUpdate(
         Add-Type -AssemblyName System.IO.Compression.FileSystem
         $stream = [IO.File]::Open($Archive, 'Open', 'Read', 'Read')
         try {
-            if ($stream.Length -gt 128MB -or $Sha256 -notmatch '\A[0-9a-fA-F]{64}\z' -or
-                (Get-FileHash -InputStream $stream -Algorithm SHA256).Hash -ine $Sha256) {
+            if ($stream.Length -gt 128MB -or $Sha256 -notmatch '\A[0-9a-fA-F]{64}\z') {
                 throw 'The update ZIP failed size or SHA-256 verification.'
             }
+            $hash = [Security.Cryptography.SHA256]::Create()
+            try { $digest = [BitConverter]::ToString($hash.ComputeHash($stream)).Replace('-', '') }
+            finally { $hash.Dispose() }
+            if ($digest -ine $Sha256) { throw 'The update ZIP failed SHA-256 verification.' }
             $stream.Position = 0
             $zip = [IO.Compression.ZipArchive]::new($stream, 'Read', $true)
             try {
