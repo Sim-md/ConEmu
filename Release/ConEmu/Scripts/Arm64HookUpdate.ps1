@@ -108,6 +108,7 @@ function Install-HookUpdate(
             [string]::CompareOrdinal($ExpectedVersion, (Get-HookBuild $localGui)) -le 0) {
             throw 'The archive is not a newer ARM64 hook build.'
         }
+        Add-Type -AssemblyName System.IO.Compression
         Add-Type -AssemblyName System.IO.Compression.FileSystem
         $stream = [IO.File]::Open($Archive, 'Open', 'Read', 'Read')
         try {

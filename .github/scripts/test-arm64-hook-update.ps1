@@ -6,8 +6,11 @@ $Archive = (Resolve-Path -LiteralPath $Archive).Path
 $lab = Join-Path $WorkDir ('conemu-arm64-hook-test-' + [guid]::NewGuid().ToString('N'))
 $root = Join-Path $lab 'installed'
 $candidate = Join-Path $lab 'candidate'
-Expand-Archive -LiteralPath $Archive -DestinationPath $root
-Expand-Archive -LiteralPath $Archive -DestinationPath $candidate
+# Unpack fixtures in a separate PowerShell so the installer must load ZIP support itself.
+$setup = 'Expand-Archive -LiteralPath ''{0}'' -DestinationPath ''{1}'' -ErrorAction Stop; Copy-Item -LiteralPath ''{1}'' -Destination ''{2}'' -Recurse -ErrorAction Stop' -f
+    $Archive.Replace("'", "''"), $root.Replace("'", "''"), $candidate.Replace("'", "''")
+& (Join-Path $env:SystemRoot 'System32/WindowsPowerShell/v1.0/powershell.exe') -NoProfile -NonInteractive -Command $setup
+if ($LASTEXITCODE) { throw 'Could not unpack the update fixtures' }
 $gui = Join-Path $root 'ConEmu64.exe'
 $version = Get-HookBuild $gui
 $validHash = (Microsoft.PowerShell.Utility\Get-FileHash -LiteralPath $Archive).Hash
