@@ -1,0 +1,103 @@
+name: ARM64 hook build and release
+
+on:
+  push:
+    branches: [arm64-hook-updates]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: github.repository == 'Sim-md/ConEmu' && github.ref == 'refs/heads/arm64-hook-updates'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    outputs:
+      tag: ${{ steps.package.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - name: Install LLVM-MinGW
+        run: |
+          archive=llvm-mingw-20261104-ucrt-ubuntu-22.04-aarch64.tar.xz
+          curl --fail --location --retry 3 -o "$RUNNER_TEMP/$archive" "https://github.com/mstorsjo/llvm-mingw/releases/download/20261104/$archive"
+          echo "595e95bdffabfc62559fe26e30bdfbccf277cbaed4902793555015ee47306b94  $RUNNER_TEMP/$archive" | sha256sum --check
+          mkdir "$RUNNER_TEMP/llvm-mingw"
+          tar -xf "$RUNNER_TEMP/$archive" --strip-components=1 -C "$RUNNER_TEMP/llvm-mingw"
+          echo "$RUNNER_TEMP/llvm-mingw/bin" >> "$GITHUB_PATH"
+      - name: Build pinned Microsoft Detours
+        run: |
+          detours="$RUNNER_TEMP/detours"
+          git init -q "$detours"
+          git -C "$detours" fetch --depth=1 https://github.com/microsoft/Detours.git 1dbd4ea281d73d478aa8d09a8b83fbd265f715f7
+          git -C "$detours" checkout --detach FETCH_HEAD
+          for source in detours modules disasm image creatwth disolx86 disolx64 disolia64 disolarm disolarm64; do
+            aarch64-w64-mingw32-clang++ -std=c++17 -O2 -DWIN32_LEAN_AND_MEAN -D_WIN32_WINNT=0x0601 \
+              -DDETOUR_DEBUG=0 -fms-extensions -D__STRSAFE__NO_INLINE -c "$detours/src/$source.cpp" -o "$detours/$source.o"
+          done
+          llvm-ar rcs "$detours/libdetours.a" "$detours"/*.o
+          echo "DETOURS_LIB=$detours/libdetours.a" >> "$GITHUB_ENV"
+          echo "DETOURS_INCLUDE=$detours/src" >> "$GITHUB_ENV"
+      - name: Build ARM64 with ConEmuHk
+        run: BUILD_DIR="$PWD/artifacts/arm64" sh build-arm64.sh
+      - name: Package the hook release
+        id: package
+        run: |
+          version=$(sed -n '1s@^// \([0-9]\{6\}[a-z]\?\)$@\1@p' src/ConEmu/version.h)
+          tag="arm64-hook-$version-${GITHUB_SHA:0:7}-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          python3 .github/scripts/package-fork-release.py artifacts dist "$GITHUB_SHA" "$tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arm64-hook-release
+          path: dist/*
+          if-no-files-found: error
+
+  test:
+    needs: build
+    runs-on: windows-11-arm
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: arm64-hook-release
+          path: dist
+      - name: Test the update transaction on ARM64 Windows
+        shell: powershell
+        run: |
+          $archive = (Get-ChildItem dist -Filter '*-arm64-hook.zip').FullName
+          & .github/scripts/test-arm64-hook-update.ps1 -Archive $archive
+
+  release:
+    needs: [build, test]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: arm64-hook-release
+          path: dist
+      - name: Publish the ARM64 hook release and its update feed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.build.outputs.tag }}
+        run: |
+          version=$(sed -n 's/^version=//p' dist/version.ini)
+          gh release create "$TAG" --target "$GITHUB_SHA" --draft --prerelease --latest=false \
+            --title "ConEmu $version ARM64 with hook" \
+            --notes "Native Windows ARM64 build with ConEmuHk. The updater checks SHA-256 before replacing files. CI: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID."
+          gh release upload "$TAG" dist/*.zip dist/SHA256SUMS.txt dist/version.ini
+          gh release edit "$TAG" --draft=false --prerelease --latest=false
+          gh auth setup-git
+          bash .github/scripts/publish-update-feed.sh dist/version.ini arm64-hook-update-feed

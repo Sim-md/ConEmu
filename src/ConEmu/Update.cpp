@@ -989,10 +989,14 @@ bool CConEmuUpdate::LoadVersionInfoFromServer()
 		}
 
 		// What version user prefers?
+#ifdef CONEMU_ARM64_HOOKS
+		_wcscpy_c(szSection, countof(szSection), L"ConEmu_ARM64_Hook");
+#else
 		_wcscpy_c(szSection, countof(szSection),
 			(mp_Set->isUpdateUseBuilds == ConEmuUpdateSettings::Builds::Stable) ? sectionConEmuStable
 			: (mp_Set->isUpdateUseBuilds == ConEmuUpdateSettings::Builds::Preview) ? sectionConEmuPreview
 			: sectionConEmuDevel);
+#endif
 		_wcscpy_c(szItem, countof(szItem), (mp_Set->UpdateDownloadSetup() == 1) ? L"location_exe" : L"location_arc");
 
 		// Check the ini-file
@@ -1012,7 +1016,13 @@ bool CConEmuUpdate::LoadVersionInfoFromServer()
 				throw ErrorInfo(L"Fork update version information is invalid");
 			}
 
+#ifdef CONEMU_ARM64_HOOKS
+			wcscpy_c(ms_CurVerInfo, ms_OurVersion);
+			swprintf_c(ms_VerOnServer, L"%s (ARM64 with hook)", ms_NewVersion);
+			wcscpy_c(ms_VerOnServerRA, ms_VerOnServer);
+#else
 			GetVersionsFromIni(pszUpdateVerLocation, ms_VerOnServer, ms_VerOnServerRA, ms_CurVerInfo);
+#endif
 			return true;
 		}
 
@@ -1723,13 +1733,48 @@ int CConEmuUpdate::QueryConfirmation(CConEmuUpdate::UpdateStep step)
 				const CEStr message(L"ConEmu ", ms_NewVersion, L" is available.");
 				if (m_ManualCallMode == UpdateCallMode::Automatic && !mp_Set->isUpdateConfirmDownload)
 				{
+#ifdef CONEMU_ARM64_HOOKS
+					Icon.ShowTrayIcon(CEStr(message, L"\nClick to review the update."), tsa_Source_Updater);
+#else
 					Icon.ShowTrayIcon(CEStr(message, L"\nClick to view releases."), tsa_Source_Updater);
+#endif
 				}
 				else
 				{
+#ifdef CONEMU_ARM64_HOOKS
+					const CEStr prompt(message, L"\n\nInstall the ARM64 update after closing Far and ConEmu?");
+					if (MsgBox(prompt, MB_ICONINFORMATION | MB_YESNO | MB_DEFBUTTON2, ms_DefaultTitle) == IDYES)
+					{
+						wchar_t systemPath[MAX_PATH]{};
+						const auto length = GetSystemDirectory(systemPath, countof(systemPath));
+						const CEStr script(gpConEmu->ms_ConEmuExeDir, L"\\ConEmu\\Scripts\\Arm64HookUpdate.ps1");
+						if (!length || length >= countof(systemPath) || !FileExists(script))
+						{
+							MsgBox(L"The bundled ARM64 updater or Windows PowerShell is missing.", MB_ICONERROR, ms_DefaultTitle);
+							break;
+						}
+						if (bNeedRunElevation)
+						{
+							MsgBox(L"Start ConEmu as administrator to update this protected installation.", MB_ICONINFORMATION, ms_DefaultTitle);
+							break;
+						}
+						wchar_t pid[16]{};
+						swprintf_c(pid, L"%u", GetCurrentProcessId());
+						const CEStr powershell(systemPath, L"\\WindowsPowerShell\\v1.0\\powershell.exe");
+						const CEStr arguments(L"-NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"", script,
+							L"\" -Version ", ms_NewVersion, L" -WaitForPid ", pid);
+						const auto result = reinterpret_cast<INT_PTR>(ShellExecute(ghWnd, L"open", powershell,
+							arguments, gpConEmu->ms_ConEmuExeDir, SW_HIDE));
+						if (result > 32)
+							gpConEmu->PostScClose();
+						else
+							MsgBox(L"Windows could not start the ARM64 updater.", MB_ICONERROR, ms_DefaultTitle);
+					}
+#else
 					const CEStr prompt(message, L"\n\nOpen the releases page?\n", gsDownlPage);
 					if (MsgBox(prompt, MB_ICONINFORMATION | MB_YESNO, ms_DefaultTitle) == IDYES)
 						ConEmuAbout::OnInfo_DownloadPage();
+#endif
 				}
 			}
 			else if (m_ManualCallMode == UpdateCallMode::TSA)

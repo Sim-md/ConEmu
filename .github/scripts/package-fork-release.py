@@ -27,7 +27,7 @@ def add_binary(files, root, source, destination, arch):
     files[destination] = path
 
 
-def package(artifacts, output, sha, arch, version):
+def package(artifacts, output, sha, arch, version, hook=False):
     files = {}
     arm = arch == "arm64"
     build = artifacts / ("arm64/package" if arm else f"binaries-{arch}")
@@ -39,7 +39,7 @@ def package(artifacts, output, sha, arch, version):
         root = build if arm else artifacts / f"binaries-{runtime}"
         bits = "" if runtime == "x86" else "64"
         names = [f"ConEmuC{bits}.exe", f"ConEmuCD{bits}.dll"]
-        if not arm:
+        if not arm or hook:
             names.append(f"ConEmuHk{bits}.dll")
         for name in names:
             path = f"ConEmu/{name}"
@@ -57,6 +57,9 @@ def package(artifacts, output, sha, arch, version):
     for name in ("ConEmu.l10n", "License.txt", "Scripts/ConEmu.NoHooks.bash", "Scripts/ConEmu.NoHooks.psm1"):
         files[f"ConEmu/{name}"] = Path("Release/ConEmu") / name
     files["ConEmu/Unicode-LICENSE.txt"] = Path("src/common/Unicode-LICENSE.txt")
+    if hook:
+        for name in ("Detours-LICENSE.txt", "Scripts/Arm64HookUpdate.ps1"):
+            files[f"ConEmu/{name}"] = build / "ConEmu" / name
     resources = Path("Release/plugins/ConEmu")
     for pattern in ("**/*.lng", "Background/Background.xml", "Background/img/*.png"):
         for path in resources.glob(pattern):
@@ -64,7 +67,8 @@ def package(artifacts, output, sha, arch, version):
     for name in ("ARM64-BUILD.md", "CONPTY.md", "FAR-SCROLLBACK.md", "SECURITY-CHANGES.txt"):
         files[name] = Path(name)
 
-    archive = output / f"ConEmu-{version}-{sha[:7]}-{arch}.zip"
+    variant = f"{arch}-hook" if hook else arch
+    archive = output / f"ConEmu-{version}-{sha[:7]}-{variant}.zip"
     with ZipFile(archive, "w", ZIP_DEFLATED) as zip_file:
         for name, path in sorted(files.items()):
             zip_file.write(path, name)
@@ -94,6 +98,19 @@ def main():
     sha = sys.argv[3]
     output.mkdir()
     version = release_version()
+    if len(sys.argv) == 5:
+        tag = sys.argv[4]
+        if not re.fullmatch(rf"arm64-hook-{version}-{sha[:7]}-[0-9]+-[0-9]+", tag):
+            raise ValueError(f"Invalid ARM64 hook release tag: {tag}")
+        archive = package(artifacts, output, sha, "arm64", version, hook=True)
+        with archive.open("rb") as stream:
+            digest = hashlib.file_digest(stream, "sha256").hexdigest()
+        url = f"https://github.com/Sim-md/ConEmu/releases/download/{tag}/{archive.name}"
+        (output / "SHA256SUMS.txt").write_text(f"{digest}  {archive.name}\n", encoding="ascii")
+        (output / "version.ini").write_text(
+            f"[ConEmu_ARM64_Hook]\nversion={version}\nsha256={digest}\nurl={url}\n", encoding="ascii"
+        )
+        return
     archives = [package(artifacts, output, sha, arch, version) for arch in MACHINES]
     checksums = [f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}" for path in archives]
     (output / "SHA256SUMS.txt").write_text("\n".join(checksums) + "\n", encoding="ascii")

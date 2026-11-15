@@ -46,6 +46,19 @@ Enable **Inject ConEmuHk** in the test profile. The experimental loader
 recognizes native ARM64 processes. An emulated x86 or x64 process continues
 without native ARM64 injection.
 
+The `arm64-hook-updates` branch builds packages for the
+[ARM64 hook feed](https://raw.githubusercontent.com/Sim-md/ConEmu/arm64-hook-update-feed/version.ini).
+Install the first ZIP with all its files to switch to that channel. The
+**Check for updates** command can then install a newer hook ZIP after you
+confirm and close ConEmu and Far. In protected directories such as Program
+Files, start ConEmu as administrator for that update.
+
+The installer verifies SHA-256 and the ARM64 binaries before replacing files.
+It keeps the existing XML files and Far installation. If an update is
+interrupted and another file is still locked, close ConEmu and Far and run
+`ConEmu/Scripts/Arm64HookUpdate.ps1 -Recover` from PowerShell with permissions
+to write to the installation directory.
+
 ## Explicit shell integration without ConEmuHk
 
 Import the bundled module from an existing PowerShell tab in ConEmu:

@@ -7,7 +7,11 @@ export GIT_COMMITTER_NAME=$GIT_AUTHOR_NAME
 export GIT_COMMITTER_EMAIL=$GIT_AUTHOR_EMAIL
 
 feed=$1
-ref=refs/heads/update-feed
+ref=refs/heads/${2:-update-feed}
+case "$ref" in
+    refs/heads/update-feed|refs/heads/arm64-hook-update-feed) ;;
+    *) exit 2 ;;
+esac
 version=$(sed -n 's/^version=//p' "$feed" | sort -u)
 [[ $version =~ ^[0-9]{6}[a-z]?$ ]]
 blob=$(git hash-object -w "$feed")
