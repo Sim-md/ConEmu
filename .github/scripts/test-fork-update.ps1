@@ -44,6 +44,8 @@ function Set-OldTestVersion([string]$Path) {
 }
 foreach ($launcher in $launcherFiles) {
     Set-OldTestVersion (Join-Path $root $launcher)
+    $map = [IO.Path]::ChangeExtension($launcher, '.map')
+    [IO.File]::WriteAllText((Join-Path $root $map), 'Older linker map')
 }
 $sentinels = @('Far.exe', 'ConEmu/ConEmu.xml', 'Plugins/ConEmu/Background/Background.xml')
 foreach ($file in $sentinels) {
@@ -154,7 +156,11 @@ if ($Architecture -ne 'arm64') {
     if ((Get-State $single $updateFiles) -ne (Get-State $candidate $updateFiles)) {
         throw 'Combined archive did not update a single-architecture installation'
     }
-    foreach ($name in $absent) {
+    $singleMap = [IO.Path]::ChangeExtension($gui, '.map')
+    if ((Get-State $single @($singleMap)) -ne (Get-State $candidate @($singleMap))) {
+        throw 'Update did not add the map for the installed launcher'
+    }
+    foreach ($name in ($absent | Where-Object { $_ -ne $singleMap })) {
         if ([IO.File]::Exists((Join-Path $single $name))) { throw "Added an uninstalled file: $name" }
     }
     'PASS combined ZIP updates a single launcher without adding the other architecture'
@@ -175,6 +181,26 @@ if ($Architecture -ne 'arm64') {
     }
     'PASS failure at the second launcher restores the first launcher and the shared files'
 }
+
+$mapToFail = $installFiles[-1]
+$newMap = if ($Architecture -eq 'arm64') { $null } else { $installFiles[-2] }
+if ($newMap) { [IO.File]::Delete((Join-Path $root $newMap)) }
+$rollbackFiles = ($installFiles + $sentinels) | Where-Object { $_ -ne $newMap }
+$beforeMapFailure = Get-State $root $rollbackFiles
+function Set-UpdateFile([string]$Source, [string]$Target, [string]$Backup) {
+    if ([IO.Path]::GetFileName($Target) -eq $mapToFail) {
+        & $replace $Source $Target $Backup
+        throw 'Injected failure after map replacement'
+    }
+    & $replace $Source $Target $Backup
+}
+Test-ExpectedFailure { Install-ForkUpdate $root $Archive $validHash $version } 'Injected failure'
+Set-Item Function:Set-UpdateFile -Value $replace
+if ((Get-State $root $rollbackFiles) -ne $beforeMapFailure -or
+    ($newMap -and [IO.File]::Exists((Join-Path $root $newMap)))) {
+    throw 'Rollback did not restore the EXEs and linker maps'
+}
+'PASS map replacement failure rolls back EXEs and existing or newly added maps'
 
 Install-ForkUpdate $root $Archive $validHash $version
 if ((Get-State $root $installFiles) -ne (Get-State $candidate $installFiles)) { throw 'Incomplete update' }

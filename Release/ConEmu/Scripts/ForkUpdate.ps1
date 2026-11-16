@@ -74,6 +74,14 @@ if ($Architecture -ne 'arm64') {
     $installFiles += @('ConEmu/ConEmu.l10n','ConEmu/Scripts/ForkUpdate.ps1') + $launcherFiles
 }
 
+# Append MAP files to preserve the recovery indexes of earlier v2 journals.
+$mapOwners = @{}
+foreach ($launcher in $launcherFiles) {
+    $map = [IO.Path]::ChangeExtension($launcher, '.map')
+    $mapOwners[$map] = $launcher
+    $installFiles += $map
+}
+
 function Assert-OrdinaryPath([string]$Path) {
     for ($item = $Path; $item; $item = [IO.Path]::GetDirectoryName($item)) {
         if (Test-Path -LiteralPath $item) {
@@ -133,8 +141,18 @@ function Undo-ForkUpdate([string]$Root, [string]$Work, [string[]]$Files, [string
     for ($i = $Files.Count - 1; $i -ge 0; $i--) {
         $backup = Join-Path $Work "${Prefix}$i.bak"
         Assert-OrdinaryPath $backup
-        if (![IO.File]::Exists($backup)) { continue }
         $target = Join-Path $Root $Files[$i]
+        if (![IO.File]::Exists($backup)) {
+            $added = Join-Path $Work "${Prefix}$i.added"
+            $staged = Join-Path $Work "${Prefix}$i.new"
+            Assert-OrdinaryPath $added
+            Assert-OrdinaryPath $staged
+            if ([IO.File]::Exists($added) -and ![IO.File]::Exists($staged)) {
+                Assert-OrdinaryPath $target
+                [IO.File]::Delete($target)
+            }
+            continue
+        }
         Assert-OrdinaryPath $target
         $restore = Join-Path $Work "${Prefix}$i.restore"
         Assert-OrdinaryPath $restore
@@ -196,7 +214,10 @@ function Install-ForkUpdate(
                     $target = Join-Path $Root $name
                     Assert-OrdinaryPath $target
                     if ($decoderOwners.ContainsKey($name) -and ![IO.File]::Exists((Join-Path $Root $decoderOwners[$name]))) { continue }
-                    if (![IO.File]::Exists($target)) {
+                    $isMap = $mapOwners.ContainsKey($name)
+                    if ($isMap -and ![IO.File]::Exists((Join-Path $Root $mapOwners[$name]))) { continue }
+                    $exists = [IO.File]::Exists($target)
+                    if (!$exists -and !$isMap) {
                         if ($name -in $optionalInstallFiles) { continue }
                         throw "Missing installed file: $target"
                     }
@@ -206,7 +227,7 @@ function Install-ForkUpdate(
                             throw "The update would downgrade an installed launcher: $target"
                         }
                     }
-                    Wait-ForUpdateFile $target
+                    if ($exists) { Wait-ForUpdateFile $target }
                     $matchesInZip = @($zip.Entries | Where-Object FullName -ieq $name)
                     if ($matchesInZip.Count -ne 1 -or $matchesInZip[0].Length -le 0 -or
                         $matchesInZip[0].Length -gt 64MB) {
@@ -229,12 +250,20 @@ function Install-ForkUpdate(
 
         for ($i = 0; $i -lt $installFiles.Count; $i++) {
             [IO.File]::Delete((Join-Path $work "v2-$i.bak"))
+            [IO.File]::Delete((Join-Path $work "v2-$i.added"))
         }
         [IO.File]::WriteAllText($active, $ExpectedVersion)
         try {
             foreach ($i in $stagedIndexes) {
-                Set-UpdateFile (Join-Path $work "v2-$i.new") (Join-Path $Root $installFiles[$i]) `
-                    (Join-Path $work "v2-$i.bak")
+                $name = $installFiles[$i]
+                $source = Join-Path $work "v2-$i.new"
+                $target = Join-Path $Root $name
+                if ($mapOwners.ContainsKey($name) -and ![IO.File]::Exists($target)) {
+                    [IO.File]::WriteAllText((Join-Path $work "v2-$i.added"), '')
+                    [IO.File]::Move($source, $target)
+                } else {
+                    Set-UpdateFile $source $target (Join-Path $work "v2-$i.bak")
+                }
             }
             [IO.File]::Delete($active)
         } catch {
@@ -246,7 +275,7 @@ function Install-ForkUpdate(
         try {
             if (![IO.File]::Exists($active)) {
                 for ($i = 0; $i -lt $installFiles.Count; $i++) {
-                    foreach ($extension in 'new','bak','restore') {
+                    foreach ($extension in 'new','bak','restore','added') {
                         [IO.File]::Delete((Join-Path $work "v2-$i.$extension"))
                     }
                 }

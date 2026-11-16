@@ -36,6 +36,10 @@ def package(artifacts, output, sha, arch, version):
         bits = "" if runtime == "x86" else "64"
         gui = f"ConEmu{bits}.exe"
         add_binary(files, root, gui, gui, runtime)
+        gui_map = root / f"ConEmu{bits}.map"
+        if not gui_map.stat().st_size:
+            raise ValueError(f"{gui_map}: empty linker map")
+        files[gui_map.name] = gui_map
         for name in (f"ConEmuC{bits}.exe", f"ConEmuCD{bits}.dll", f"ConEmuHk{bits}.dll"):
             path = f"ConEmu/{name}"
             add_binary(files, root, path, path, runtime)

@@ -50,6 +50,7 @@ jobs:
           name: binaries-${{ matrix.arch }}
           path: |
             Release/ConEmu${{ matrix.suffix }}.exe
+            Release/ConEmu${{ matrix.suffix }}.map
             Release/ConEmu/ConEmuC${{ matrix.suffix }}.exe
             Release/ConEmu/ConEmuCD${{ matrix.suffix }}.dll
             Release/ConEmu/ConEmuHk${{ matrix.suffix }}.dll

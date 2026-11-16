@@ -1490,6 +1490,8 @@
     "cbIntegralSize": {
       "en": [ "When checked, ConEmu windows size is changed proportionally to console cells.\n"
             , "Option is disabled automatically for Quake and Inside modes, and for 100% window width or height." ],
+      "ru": [ "При изменении размера окно ConEmu подстраивается под целое число ячеек консоли.\n"
+            , "Настройка автоматически отключается в режимах Quake и Inside, а также при ширине или высоте окна 100%." ],
       "es": [ "Cuando está habilitado, el tamaño de las ventanas de ConEmu se cambia proporcionalmente a las celdas de la consola.\n"
             , "Esta opción se deshabilita para los modos Quake y dentro, y si el ancho o el alto de la ventana es del 100%." ],
       "pl": [ "Gdy zaznaczone, rozmiar okien ConEmu jest zmieniany proporcjonalnie do komórek konsoli.\n"
@@ -3520,6 +3522,7 @@
     ,
     "tFarHourglass": {
       "en": "Far Manager not-responding duration in milliseconds before changing mouse cursor to AppStarting",
+      "ru": "Через сколько миллисекунд без ответа от Far Manager показывать курсор ожидания AppStarting.",
       "es": "Duración de no-respuesta de Far Manager en milisegundos antes de cambiar el cursor a InicioApp",
       "pl": "Czas braku odpowiedzi Far Managera w ms przed zmianą kursora myszy na Uruchamianie aplikacji",
       "ko": "마우스 커서를 AppStarting으로 변경하기 전 Far Manager가 응답하지 않는 밀리초 시간",
@@ -6310,6 +6313,7 @@
     ,
     "vkSetFocusParent": {
       "en": "Set focus to the ConEmu parent window (ConEmu Inside mode)",
+      "ru": "Перевести фокус на родительское окно ConEmu (режим Inside).",
       "es": "Centrar el foco en la ventana matriz de ConEmu (modo dentro de ConEmu)",
       "pl": "Ustaw fokus na okno nadrzędne ConEmu (tryb ConEmu Inside)",
       "ko": "ConEmu 부모 창에 포커스 설정 (ConEmu Inside 모드)",
@@ -7355,6 +7359,7 @@
     ,
     "lng_ConfirmCloseBtnGroup": {
       "en": "Close group of",
+      "ru": "Закрыть группу из",
       "zh": "关闭",
       "es": "Cerrar grupo de",
       "pl": "Zamknij grupe",
@@ -7472,6 +7477,7 @@
     ,
     "lng_ConfirmKillingQ": {
       "en": "Confirm killing?",
+      "ru": "Подтверждаете принудительное завершение?",
       "zh": "同意杀死？",
       "es": "¿Matar?",
       "pl": "Potwierdzasz zabijanie?",
@@ -7915,6 +7921,7 @@
     ,
     "lng_MenuBringHere": {
       "en": "Bring &here",
+      "ru": "Перенести &сюда",
       "zh": "移动到这里(&H)",
       "de": "Auf aktiven Bildschirm verschieben",
       "es": "Traer aquí",
@@ -8260,6 +8267,7 @@
     ,
     "lng_MenuDuplicate": {
       "en": "Duplica&te root...",
+      "ru": "&Дублировать корневой процесс...",
       "zh": "复制根进程(&T)...",
       "de": "Duplizieren...",
       "pl": "Duplikuj & root...",
@@ -8338,6 +8346,7 @@
     ,
     "lng_MenuMiniDumpTree": {
       "en": "Active &tree memory dump...",
+      "ru": "Дамп памяти активного &дерева процессов...",
       "zh": "当前树内存转储(&T)...",
       "de": "Speicherabbild des aktiven Prozess&baums",
       "pl": "Aktywny &zrzut pamięci drzewa...",
@@ -8478,6 +8487,7 @@
     ,
     "lng_MenuPopupTerminate": {
       "en": "Close or &kill",
+      "ru": "&Закрыть или завершить",
       "zh": "关闭或杀掉",
       "de": "Schließen und &beenden",
       "pl": "Zamknij lub zabij",
@@ -8653,6 +8663,7 @@
     ,
     "lng_MenuTerminate2Right": {
       "en": "Close to the &right",
+      "ru": "Закрыть вкладки &справа",
       "zh": "关闭右侧的",
       "de": "Alle Konsolen &rechts schließen",
       "pl": "Bliżej prawej",
@@ -8673,6 +8684,7 @@
     ,
     "lng_MenuTerminateButShell": {
       "en": "Kill all but &shell",
+      "ru": "Завершить всё, кроме &оболочки",
       "zh": "终止除根进程外所有进程",
       "de": "Alle bis auf die Shell-Prozess beenden",
       "pl": "Zabij wszystkich oprócz powłoki",
@@ -8738,6 +8750,7 @@
     ,
     "lng_MenuTerminateZombies": {
       "en": "Close all &zombies",
+      "ru": "Закрыть все &зависшие консоли",
       "zh": "关闭所有 zombies",
       "de": "Alle '&Zombies' schließen",
       "pl": "Zamknij wszystkie zombie",
@@ -8986,6 +8999,7 @@
     ,
     "lng_ResetTerminalTitle": {
       "en": "Reset terminal confirmation",
+      "ru": "Подтверждение сброса терминала",
       "zh": "重置终端确认",
       "pl": "Zresetuj potwierdzenie terminala",
       "it_IT": "Conferma ripristino terminale",
@@ -8997,6 +9011,9 @@
       "en": [ "Warning!\n"
             , "This operation could harm further output of applications.\n"
             , "It's better to execute a dedicated command as `clear` or `cls`." ],
+      "ru": [ "Внимание!\n"
+            , "Эта операция может нарушить дальнейший вывод приложений.\n"
+            , "Лучше воспользоваться командой clear или cls." ],
       "zh": [ "警告！\n"
             , "这项操作可能会损坏应用程序之后的输出。\n"
             , "最好执行一个专用命令，如 `clear` 或 `cls` 。" ],
@@ -9081,6 +9098,7 @@
     ,
     "lng_SetPgInfoNone": {
       "en": "(None)",
+      "ru": "(Нет)",
       "zh": "（无）",
       "pl": "(Żaden)",
       "it_IT": "(Nulla)",
