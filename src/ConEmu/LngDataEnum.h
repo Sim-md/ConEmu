@@ -237,6 +237,9 @@ enum LngResources
 	lng_HotkeyChooseModifier      = 206,
 	lng_HotkeyChooseModifiers     = 207,
 	lng_HotkeyGuiMacro            = 208,
+	lng_HotkeyColumnType          = 209,
+	lng_HotkeyColumnKey           = 210,
+	lng_HotkeyColumnDescription   = 211,
 	// last auto-gen identifier
 	lng_NextId
 };

@@ -93,11 +93,14 @@ LRESULT CSetPgKeys::OnInitDialog(HWND hDlg, bool abInitial)
 		ListView_SetExtendedListViewStyleEx(hList,LVS_EX_FULLROWSELECT,LVS_EX_FULLROWSELECT);
 		ListView_SetExtendedListViewStyleEx(hList,LVS_EX_LABELTIP|LVS_EX_INFOTIP,LVS_EX_LABELTIP|LVS_EX_INFOTIP);
 
-		wcscpy_c(szTitle, L"Type");			ListView_InsertColumn(hList, klc_Type, &col);
-		col.cx = gpSetCls->EvalSize(120, esf_Horizontal|esf_CanUseDpi);
-		wcscpy_c(szTitle, L"Hotkey");		ListView_InsertColumn(hList, klc_Hotkey, &col);
+		wcscpy_c(szTitle, CLngRc::getRsrc(lng_HotkeyColumnType));
+		ListView_InsertColumn(hList, klc_Type, &col);
+		col.cx = gpSetCls->EvalSize(128, esf_Horizontal|esf_CanUseDpi);
+		wcscpy_c(szTitle, CLngRc::getRsrc(lng_HotkeyColumnKey));
+		ListView_InsertColumn(hList, klc_Hotkey, &col);
 		col.cx = gpSetCls->EvalSize(300, esf_Horizontal|esf_CanUseDpi);
-		wcscpy_c(szTitle, L"Description");	ListView_InsertColumn(hList, klc_Desc, &col);
+		wcscpy_c(szTitle, CLngRc::getRsrc(lng_HotkeyColumnDescription));
+		ListView_InsertColumn(hList, klc_Desc, &col);
 	}
 
 	FillHotKeysList(hDlg, abInitial);

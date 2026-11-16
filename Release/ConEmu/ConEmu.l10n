@@ -1500,6 +1500,18 @@
             , "옵션은 Quake 및 내부 모드 및 100% 창 너비 또는 높이에 대해 자동으로 사용할 수 없습니다." ],
       "ko_KR": [ "선택하면 콘솔 셀에 비례하여 ConEmu 창 크기가 변경됩니다.\n"
             , "옵션은 Quake 및 내부 모드 및 100% 창 너비 또는 높이에 대해 자동으로 사용할 수 없습니다." ],
+      "zh": [ "启用后，ConEmu 窗口大小按整字符单元调整。\n"
+            , "在 Quake 或 Inside 模式下，或窗口宽度或高度为 100% 时，此选项自动禁用。" ],
+      "de": [ "Die Fenstergröße von ConEmu wird an ganze Konsolenzellen angepasst.\n"
+            , "In den Modi Quake und Inside sowie bei 100 % Fensterbreite oder -höhe ist die Option deaktiviert." ],
+      "ja": [ "有効にすると、ConEmu のウィンドウサイズをコンソールの文字セル単位で調整します。\n"
+            , "Quake または Inside モード、またはウィンドウの幅や高さが 100% の場合は自動的に無効になります。" ],
+      "it_IT": [ "La dimensione della finestra di ConEmu si allinea alle celle intere della console.\n"
+            , "L’opzione è disattivata nei modi Quake e Inside e se la larghezza o l’altezza della finestra è al 100%." ],
+      "fr": [ "La taille de la fenêtre ConEmu s’aligne sur les cellules entières de la console.\n"
+            , "Cette option est désactivée en mode Quake ou Inside, ou si la largeur ou la hauteur de la fenêtre est de 100 %." ],
+      "pt_BR": [ "O tamanho da janela do ConEmu se ajusta a células inteiras do console.\n"
+            , "A opção é desativada nos modos Quake e Inside ou quando a largura ou altura da janela é de 100%." ],
       "id": 2594 }
     ,
     "cbItalic": {
@@ -3527,6 +3539,12 @@
       "pl": "Czas braku odpowiedzi Far Managera w ms przed zmianą kursora myszy na Uruchamianie aplikacji",
       "ko": "마우스 커서를 AppStarting으로 변경하기 전 Far Manager가 응답하지 않는 밀리초 시간",
       "ko_KR": "마우스 커서를 AppStarting으로 변경하기 전 Far Manager가 응답하지 않는 밀리초 시간",
+      "zh": "Far Manager 无响应多少毫秒后显示等待光标 AppStarting",
+      "de": "Zeit in Millisekunden ohne Antwort von Far Manager, bis der Wartezeiger AppStarting angezeigt wird",
+      "ja": "Far Manager が応答しなくなってから待機カーソル AppStarting を表示するまでの時間（ミリ秒）",
+      "it_IT": "Tempo in millisecondi prima di mostrare il cursore di attesa AppStarting se Far Manager non risponde",
+      "fr": "Délai en millisecondes sans réponse de Far Manager avant d’afficher le curseur d’attente AppStarting",
+      "pt_BR": "Tempo em milissegundos sem resposta do Far Manager antes de mostrar o cursor de espera AppStarting",
       "id": 3111 }
     ,
     "tFontCharset": {
@@ -6314,10 +6332,16 @@
     "vkSetFocusParent": {
       "en": "Set focus to the ConEmu parent window (ConEmu Inside mode)",
       "ru": "Перевести фокус на родительское окно ConEmu (режим Inside).",
-      "es": "Centrar el foco en la ventana matriz de ConEmu (modo dentro de ConEmu)",
+      "es": "Dar el foco a la ventana padre de ConEmu (modo Inside)",
       "pl": "Ustaw fokus na okno nadrzędne ConEmu (tryb ConEmu Inside)",
       "ko": "ConEmu 부모 창에 포커스 설정 (ConEmu Inside 모드)",
       "ko_KR": "ConEmu 부모 창에 포커스 설정 (ConEmu Inside 모드)",
+      "zh": "将焦点移至 ConEmu 的父窗口（Inside 模式）",
+      "de": "Fokus auf ConEmus Elternfenster setzen (Inside-Modus)",
+      "ja": "ConEmu の親ウィンドウにフォーカスを移す（Inside モード）",
+      "it_IT": "Sposta il focus sulla finestra padre di ConEmu (modalità Inside)",
+      "fr": "Donner le focus à la fenêtre parente de ConEmu (mode Inside)",
+      "pt_BR": "Mover o foco para a janela pai do ConEmu (modo Inside)",
       "id": 3212 }
     ,
     "vkSetFocusSwitch": {
@@ -7366,6 +7390,10 @@
       "it_IT": "Chiudi gruppo di",
       "ko": "그룹 닫기",
       "ko_KR": "그룹 닫기",
+      "de": "Gruppe schließen:",
+      "ja": "グループを閉じる:",
+      "fr": "Fermer le groupe de",
+      "pt_BR": "Fechar grupo de",
       "id": 201 }
     ,
     "lng_ConfirmCloseChildGuiQ": {
@@ -7484,6 +7512,10 @@
       "it_IT": "Conferma chiusura forzata?",
       "ko": "죽이시겠습니까?",
       "ko_KR": "죽이시겠습니까?",
+      "de": "Beenden erzwingen?",
+      "ja": "強制終了しますか？",
+      "fr": "Forcer l’arrêt ?",
+      "pt_BR": "Forçar encerramento?",
       "id": 186 }
     ,
     "lng_ConfirmUnsavedEditors": {
@@ -7706,15 +7738,17 @@
     ,
     "lng_HotkeysAll": {
       "en": "All hotkeys",
-      "ru": "Все хоткеи",
+      "ru": "Все горячие клавиши",
       "zh": "所有热键（&A）",
       "de": "Alle Tastenkürzel",
       "ja": "すべてのホットキー",
-      "es": "Todas las combinaciones",
-      "pl": "Wszystkie klawisze skrótu",
+      "es": "Todos los atajos",
+      "pl": "Wszystkie skróty",
       "it_IT": "Tutte le le combinazioni",
       "ko": "모든 단축키",
       "ko_KR": "모든 단축키",
+      "fr": "Tous les raccourcis",
+      "pt_BR": "Todos os atalhos",
       "id": 58 }
     ,
     "lng_HotkeyChooseModifier": {
@@ -7759,6 +7793,48 @@
       "ko_KR": "GUI 매크로:",
       "pt_BR": "Macro da interface:",
       "id": 208 },
+    "lng_HotkeyColumnType": {
+      "en": "Type",
+      "ru": "Тип",
+      "zh": "类型",
+      "de": "Typ",
+      "ja": "種類",
+      "es": "Tipo",
+      "pl": "Typ",
+      "it_IT": "Tipo",
+      "fr": "Type",
+      "ko": "유형",
+      "pt_BR": "Tipo",
+      "ko_KR": "유형",
+      "id": 209 },
+    "lng_HotkeyColumnKey": {
+      "en": "Hotkey",
+      "ru": "Горячая клавиша",
+      "zh": "快捷键",
+      "de": "Tastenkürzel",
+      "ja": "ホットキー",
+      "es": "Atajo",
+      "pl": "Skrót",
+      "it_IT": "Scorciatoia",
+      "fr": "Raccourci",
+      "ko": "단축키",
+      "pt_BR": "Atalho",
+      "ko_KR": "단축키",
+      "id": 210 },
+    "lng_HotkeyColumnDescription": {
+      "en": "Description",
+      "ru": "Описание",
+      "zh": "说明",
+      "de": "Beschreibung",
+      "ja": "説明",
+      "es": "Descripción",
+      "pl": "Opis",
+      "it_IT": "Descrizione",
+      "fr": "Description",
+      "ko": "설명",
+      "pt_BR": "Descrição",
+      "ko_KR": "설명",
+      "id": 211 },
     "lng_HotkeysFilter": {
       "en": "Filter hotkeys (Alt+F)",
       "ru": "Фильтрация хоткеев (Alt+F)",
@@ -7783,6 +7859,8 @@
       "it_IT": "Macro",
       "ko": "매크로",
       "ko_KR": "매크로",
+      "fr": "Macros",
+      "pt_BR": "Macros",
       "id": 61 }
     ,
     "lng_HotkeysSystem": {
@@ -7796,6 +7874,8 @@
       "it_IT": "Sistema",
       "ko": "시스템",
       "ko_KR": "시스템",
+      "fr": "Système",
+      "pt_BR": "Sistema",
       "id": 60 }
     ,
     "lng_HotkeysUser": {
@@ -7805,10 +7885,12 @@
       "de": "Benutzerdefiniert",
       "ja": "ユーザー定義の",
       "es": "Definido por usuario",
-      "pl": "Zdefiniowane przez użytkownika",
+      "pl": "Własne",
       "it_IT": "Definita dall'utente",
       "ko": "사용자 정의",
       "ko_KR": "사용자 정의",
+      "fr": "Personnalisés",
+      "pt_BR": "Personalizados",
       "id": 59 }
     ,
     "lng_JumpListUpdated": {
@@ -7928,6 +8010,10 @@
       "pl": "Przynieś &tutaj",
       "ko": "여기로 가져오기(&H)",
       "ko_KR": "여기로 가져오기(&H)",
+      "ja": "ここに移動(&H)",
+      "it_IT": "Sposta &qui",
+      "fr": "Déplacer &ici",
+      "pt_BR": "Mover para &cá",
       "id": 145 }
     ,
     "lng_MenuChangeAffinity": {
@@ -8274,6 +8360,10 @@
       "it_IT": "Duplica &radice...",
       "ko": "루트 복제(&T)...",
       "ko_KR": "루트 복제(&T)...",
+      "ja": "ルートプロセスを複製(&D)...",
+      "es": "&Duplicar el proceso raíz...",
+      "fr": "&Dupliquer le processus racine…",
+      "pt_BR": "&Duplicar processo raiz...",
       "id": 101 }
     ,
     "lng_MenuHelp": {
@@ -8353,6 +8443,10 @@
       "it_IT": "Dump della memoria dell'&albero del processo attivo...",
       "ko": "활성 트리 메모리 덤프(&T)...",
       "ko_KR": "활성 트리 메모리 덤프(&T)...",
+      "ja": "アクティブなプロセスツリーのメモリダンプ(&T)...",
+      "es": "Volcado de memoria del árbol &activo...",
+      "fr": "Vidage mémoire de l’&arborescence active…",
+      "pt_BR": "Despejo de memória da árvore &ativa...",
       "id": 172 }
     ,
     "lng_MenuMoreTasks": {
@@ -8494,6 +8588,10 @@
       "it_IT": "Chiudi o &forza chiusura",
       "ko": "닫기 또는 죽이기(&K)",
       "ko_KR": "닫기 또는 죽이기(&K)",
+      "ja": "閉じるか強制終了(&K)",
+      "es": "Cerrar o &forzar el cierre",
+      "fr": "Fermer ou &forcer l’arrêt",
+      "pt_BR": "Fechar ou &forçar encerramento",
       "id": 113 }
     ,
     "lng_MenuRenameTab": {
@@ -8669,6 +8767,11 @@
       "pl": "Bliżej prawej",
       "ko": "오른쪽 가까이(&R)",
       "ko_KR": "오른쪽 가까이(&R)",
+      "ja": "右側のタブを閉じる(&R)",
+      "es": "Cerrar las pestañas de la &derecha",
+      "it_IT": "Chiudi le schede a &destra",
+      "fr": "Fermer les onglets à &droite",
+      "pt_BR": "Fechar abas à &direita",
       "id": 98 }
     ,
     "lng_MenuTerminateAllCon": {
@@ -8691,6 +8794,10 @@
       "it_IT": "Forza chiusura di tutto tranne &shell",
       "ko": "쉘을 제외하고 모두 죽이기(&S)",
       "ko_KR": "쉘을 제외하고 모두 죽이기(&S)",
+      "ja": "シェル以外を強制終了(&S)",
+      "es": "Terminar todo salvo la &consola de comandos",
+      "fr": "Forcer l’arrêt de tout sauf du &shell",
+      "pt_BR": "Encerrar tudo, exceto o &shell",
       "id": 92 }
     ,
     "lng_MenuTerminateCon": {
@@ -8757,6 +8864,10 @@
       "it_IT": "Chiudi tutti i processi &zombie",
       "ko": "모든 좀비 닫기(&Z)",
       "ko_KR": "모든 좀비 닫기(&Z)",
+      "ja": "ゾンビコンソールをすべて閉じる(&Z)",
+      "es": "Cerrar todas las consolas &zombi",
+      "fr": "Fermer toutes les consoles &zombies",
+      "pt_BR": "Fechar todos os consoles &zumbis",
       "id": 96 }
     ,
     "lng_MenuUnfasten": {
@@ -9005,6 +9116,11 @@
       "it_IT": "Conferma ripristino terminale",
       "ko": "터미널 확인 재설정",
       "ko_KR": "터미널 확인 재설정",
+      "de": "Zurücksetzen des Terminals bestätigen",
+      "ja": "端末のリセットの確認",
+      "es": "Confirmar el restablecimiento del terminal",
+      "fr": "Confirmer la réinitialisation du terminal",
+      "pt_BR": "Confirmar a redefinição do terminal",
       "id": 175 }
     ,
     "lng_ResetTerminalWarning": {
@@ -9029,6 +9145,21 @@
       "ko_KR": [ "경고!\n"
             , "이 작업은 응용프로그램의 추가 출력에 손상을 줄 수 있습니다.\n"
             , "전용 명령을`clear` 또는`cls`로 실행하는 것이 좋습니다." ],
+      "de": [ "Warnung!\n"
+            , "Dieser Vorgang kann die weitere Ausgabe von Anwendungen beeinträchtigen.\n"
+            , "Verwenden Sie besser clear oder cls." ],
+      "ja": [ "警告！\n"
+            , "この操作はアプリケーションの以降の出力に影響する可能性があります。\n"
+            , "代わりに clear または cls コマンドを使用してください。" ],
+      "es": [ "¡Advertencia!\n"
+            , "Esta operación puede afectar a la salida posterior de las aplicaciones.\n"
+            , "Es preferible usar el comando clear o cls." ],
+      "fr": [ "Attention !\n"
+            , "Cette opération peut perturber l’affichage ultérieur des applications.\n"
+            , "Utilisez de préférence la commande clear ou cls." ],
+      "pt_BR": [ "Atenção!\n"
+            , "Esta operação pode afetar a saída posterior dos aplicativos.\n"
+            , "Prefira executar o comando clear ou cls." ],
       "id": 173 }
     ,
     "lng_Search": {
@@ -9104,6 +9235,11 @@
       "it_IT": "(Nulla)",
       "ko": "(없음)",
       "ko_KR": "(없음)",
+      "de": "(Keine)",
+      "ja": "(なし)",
+      "es": "(Ninguno)",
+      "fr": "(Aucun)",
+      "pt_BR": "(Nenhum)",
       "id": 89 }
     ,
     "lng_ShowSystemMenuHint": {
@@ -11776,14 +11912,17 @@
     ,
     "cbKeyBarRClick": {
       "en": "KeyBar RClick",
-      "ru": "KeyBar RClick",
-      "zh": "KeyBar RClick",
-      "de": "KeyBar RClick",
+      "ru": "Правый клик по панели клавиш",
+      "zh": "右键单击功能键栏",
+      "de": "Rechtsklick auf die Funktionstastenleiste",
       "ja": "KeyBar 右クリック",
       "es": "ClickDer Barra",
-      "pl": "KeyBar RClick",
+      "pl": "Prawy klik paska klawiszy",
       "ko": "키 표시줄 오른쪽 클릭",
       "ko_KR": "키 표시줄 오른쪽 클릭",
+      "it_IT": "Clic destro sulla barra dei tasti",
+      "fr": "Clic droit sur la barre des touches",
+      "pt_BR": "Clique direito na barra de teclas",
       "id": 2114 }
     ,
     "cbKillSshAgent": {
@@ -14125,7 +14264,7 @@
     ,
     "gbWindowSize": {
       "en": "Window size (cells, pixels or percents)",
-      "ru": "Размер окна (cells, pixels or percents)",
+      "ru": "Размер окна (ячейки, пиксели или %)",
       "zh": "窗口大小（单元格，像素或百分比）",
       "de": "Fenstergröße (Zellen, Pixel oder Prozen)",
       "ja": "ウィンドウサイズ(セル,ピクセルまたはパーセント)",
@@ -14134,6 +14273,8 @@
       "it_IT": "Dimensione finestra (celle, pixel o percentuale)",
       "ko": "창 크기 (셀, 픽셀 또는 백분율)",
       "ko_KR": "창 크기 (셀, 픽셀 또는 백분율)",
+      "fr": "Taille (cellules, pixels ou %)",
+      "pt_BR": "Tamanho (células, pixels ou %)",
       "id": 2893 }
     ,
     "gbWindowSizePos": {

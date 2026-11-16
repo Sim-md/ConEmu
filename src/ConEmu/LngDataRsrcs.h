@@ -236,5 +236,8 @@ static LngPredefined gsDataRsrcs[] = {
 	{ lng_HotkeyChooseModifier,      L"Choose modifier:" },
 	{ lng_HotkeyChooseModifiers,     L"Choose modifiers:" },
 	{ lng_HotkeyGuiMacro,            L"GUI Macro:" },
+	{ lng_HotkeyColumnType,          L"Type" },
+	{ lng_HotkeyColumnKey,           L"Hotkey" },
+	{ lng_HotkeyColumnDescription,   L"Description" },
 	{ /* empty trailing item for patch convenience */ }
 };

@@ -32,6 +32,7 @@ struct ListBoxItem
 {
 	DWORD nValue;
 	LPCWSTR sValue;
+	UINT labelId = 0;
 };
 
 enum KeysFilterValues

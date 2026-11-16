@@ -174,6 +174,8 @@ bool CustomStatic(HWND control)
 		|| CDlgItemHelper::isHyperlinkCtrl(id);
 }
 
+constexpr wchar_t HeaderHoverProperty[] = L"ConEmuDarkHeaderHover";
+
 void PaintHeader(HWND window, HDC dc)
 {
 	const int saved = SaveDC(dc);
@@ -181,20 +183,79 @@ void PaintHeader(HWND window, HDC dc)
 	FillRect(dc, &client, Brush(dc, Background));
 	SelectObject(dc, reinterpret_cast<HFONT>(SendMessage(window, WM_GETFONT, 0, 0)));
 	SetBkMode(dc, TRANSPARENT); SetTextColor(dc, Text);
-	POINT cursor; GetCursorPos(&cursor); ScreenToClient(window, &cursor);
+	const auto hovered = reinterpret_cast<INT_PTR>(GetProp(window, HeaderHoverProperty));
 	for (int i = 0; i < Header_GetItemCount(window); ++i)
 	{
-		RECT rc; Header_GetItemRect(window, i, &rc);
+		RECT rc{};
+		if (!Header_GetItemRect(window, i, &rc)) continue;
 		wchar_t text[256] = {}; HDITEM item = {};
 		item.mask = HDI_TEXT | HDI_FORMAT; item.pszText = text; item.cchTextMax = countof(text);
 		Header_GetItem(window, i, &item);
-		FillRect(dc, &rc, Brush(dc, PtInRect(&rc, cursor) ? Hover : Control));
+		FillRect(dc, &rc, Brush(dc, hovered == i + 1 ? Hover : Control));
 		RECT edge = rc; edge.left = edge.right - 1; FillRect(dc, &edge, Brush(dc, Border));
 		InflateRect(&rc, -5, 0);
 		DrawText(dc, text, -1, &rc, DT_SINGLELINE | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX
 			| ((item.fmt & HDF_CENTER) ? DT_CENTER : (item.fmt & HDF_RIGHT) ? DT_RIGHT : DT_LEFT));
 	}
 	RestoreDC(dc, saved);
+}
+
+void PaintBufferedHeader(HWND window, HDC dc)
+{
+	RECT client{};
+	GetClientRect(window, &client);
+	const int width = RectWidth(client), height = RectHeight(client);
+	const HDC buffer = CreateCompatibleDC(dc);
+	const HBITMAP bitmap = buffer && width > 0 && height > 0
+		? CreateCompatibleBitmap(dc, width, height) : nullptr;
+	if (bitmap)
+	{
+		const auto previous = SelectObject(buffer, bitmap);
+		PaintHeader(window, buffer);
+		BitBlt(dc, 0, 0, width, height, buffer, 0, 0, SRCCOPY);
+		SelectObject(buffer, previous);
+		DeleteObject(bitmap);
+	}
+	else
+	{
+		PaintHeader(window, dc);
+	}
+	if (buffer) DeleteDC(buffer);
+}
+
+void UpdateHeaderHover(HWND window, UINT message, LPARAM mousePosition)
+{
+	const auto previous = reinterpret_cast<INT_PTR>(GetProp(window, HeaderHoverProperty));
+	INT_PTR current = 0;
+	if (message == WM_MOUSEMOVE)
+	{
+		const POINT cursor{static_cast<short>(LOWORD(mousePosition)), static_cast<short>(HIWORD(mousePosition))};
+		RECT client{};
+		GetClientRect(window, &client);
+		if (PtInRect(&client, cursor))
+		{
+			for (int i = 0; i < Header_GetItemCount(window); ++i)
+			{
+				RECT rect{};
+				if (Header_GetItemRect(window, i, &rect) && PtInRect(&rect, cursor))
+				{
+					current = i + 1;
+					break;
+				}
+			}
+		}
+	}
+	if (current == previous) return;
+	if (current)
+		SetProp(window, HeaderHoverProperty, reinterpret_cast<HANDLE>(current));
+	else
+		RemoveProp(window, HeaderHoverProperty);
+	for (const auto item : {previous, current})
+	{
+		RECT rect{};
+		if (item && Header_GetItemRect(window, static_cast<int>(item - 1), &rect))
+			InvalidateRect(window, &rect, FALSE);
+	}
 }
 
 void PaintLabel(HWND window, HDC dc, bool hotkey)
@@ -236,9 +297,34 @@ void PaintLabel(HWND window, HDC dc, bool hotkey)
 	RestoreDC(dc, saved);
 }
 
+void PaintListFrame(HWND window)
+{
+	const auto style = GetWindowLong(window, GWL_STYLE);
+	const auto exStyle = GetWindowLong(window, GWL_EXSTYLE);
+	if (!(style & WS_BORDER) && !(exStyle & WS_EX_CLIENTEDGE)) return;
+
+	RECT frame{};
+	if (!GetWindowRect(window, &frame)) return;
+	OffsetRect(&frame, -frame.left, -frame.top);
+	if (const auto dc = GetWindowDC(window))
+	{
+		FrameRect(dc, &frame, Brush(dc, Border));
+		if (exStyle & WS_EX_CLIENTEDGE)
+		{
+			InflateRect(&frame, -1, -1);
+			FrameRect(dc, &frame, Brush(dc, Control));
+		}
+		ReleaseDC(window, dc);
+	}
+}
+
 LRESULT CALLBACK ControlProc(HWND window, UINT message, WPARAM wp, LPARAM lp, UINT_PTR id, DWORD_PTR kind)
 {
-	if (message == WM_NCDESTROY) RemoveWindowSubclass(window, ControlProc, id);
+	if (message == WM_NCDESTROY)
+	{
+		if (kind == 3) RemoveProp(window, HeaderHoverProperty);
+		RemoveWindowSubclass(window, ControlProc, id);
+	}
 	if (global::g_darkModeEnabled)
 	{
 		// Enabled statics may have application painting (e.g. the palette preview).
@@ -253,7 +339,7 @@ LRESULT CALLBACK ControlProc(HWND window, UINT message, WPARAM wp, LPARAM lp, UI
 			HDC dc = message == WM_PAINT ? BeginPaint(window, &ps) : reinterpret_cast<HDC>(wp);
 			if (kind == 1) PaintButton(window, dc);
 			else if (kind == 2) PaintTabs(window, dc);
-			else if (kind == 3) PaintHeader(window, dc);
+			else if (kind == 3) PaintBufferedHeader(window, dc);
 			else PaintLabel(window, dc, kind == 5);
 			if (message == WM_PAINT) EndPaint(window, &ps);
 			return 0;
@@ -263,8 +349,15 @@ LRESULT CALLBACK ControlProc(HWND window, UINT message, WPARAM wp, LPARAM lp, UI
 		{
 			TRACKMOUSEEVENT track = {sizeof(track), TME_LEAVE, window, 0}; TrackMouseEvent(&track);
 		}
+		if (kind == 3 && (message == WM_MOUSEMOVE || message == WM_MOUSELEAVE))
+			UpdateHeaderHover(window, message, lp);
 	}
 	const LRESULT result = DefSubclassProc(window, message, wp, lp);
+	if (message == WM_NCPAINT && global::g_darkModeEnabled
+		&& (IsClass(window, WC_LISTBOX) || IsClass(window, WC_LISTVIEW) || IsClass(window, WC_TREEVIEW)))
+		PaintListFrame(window);
+	if (kind == 3 && (message == WM_MOUSEMOVE || message == WM_MOUSELEAVE))
+		return result;
 	if (kind && (message == WM_MOUSEMOVE || message == WM_MOUSELEAVE || message == WM_LBUTTONDOWN
 		|| message == WM_LBUTTONUP || message == WM_KEYDOWN || message == WM_KEYUP || message == WM_ENABLE
 		|| message == BM_SETCHECK || message == BM_SETSTATE || message == WM_SETFOCUS || message == WM_KILLFOCUS))
