@@ -2101,12 +2101,6 @@ INT_PTR CSettings::wndOpProc(HWND hWnd2, UINT messg, WPARAM wParam, LPARAM lPara
 			SendMessage(hWnd2, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hClassIcon));
 			SendMessage(hWnd2, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hClassIconSm));
 
-			#ifdef _DEBUG
-			//if (IsDebuggerPresent())
-			if (!gpSet->isAlwaysOnTop)
-				SetWindowPos(ghOpWnd, HWND_NOTOPMOST, 0,0,0,0, SWP_NOSIZE|SWP_NOMOVE);
-			#endif
-
 			SetClassLongPtr(hWnd2, GCLP_HICON, reinterpret_cast<LONG_PTR>(hClassIcon));
 			gpSetCls->OnInitDialog();
 			ApplySettingsTheme(hWnd2);

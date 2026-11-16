@@ -773,7 +773,7 @@ void Settings::InitSettings()
 	isStatusColumnHidden[csi_Time] = true;
 
 	isTabs = 1; nTabsLocation = 0; isTabIcons = true; isOneTabPerGroup = false;
-	isTabsUseWindowsAccent = false;
+	isTabsUseWindowsAccent = true;
 	bActivateSplitMouseOver = 1; // 1 - always, 2 - Regarding Windows settings (Active window tracking)
 	isTabSelf = true; isTabRecent = true; isTabLazy = true;
 	nTabFlashChanged = 8;

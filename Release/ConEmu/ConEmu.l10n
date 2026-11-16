@@ -12568,6 +12568,21 @@
       "ko_KR": "하단의 탭",
       "id": 2481 }
     ,
+    "cbTabsUseWindowsAccent": {
+      "en": "Use Windows accent color for tabs and toolbar",
+      "ru": "Цвет акцента Windows для вкладок и панели кнопок",
+      "zh": "在标签页和工具栏上使用 Windows 强调色",
+      "de": "Windows-Akzentfarbe für Tabs und Symbolleiste verwenden",
+      "ja": "タブとツールバーに Windows のアクセントカラーを使う",
+      "es": "Usar el color de énfasis de Windows en pestañas y barra de herramientas",
+      "pl": "Używaj koloru akcentu Windows na kartach i pasku narzędzi",
+      "it_IT": "Usa il colore principale di Windows per schede e barra degli strumenti",
+      "fr": "Utiliser la couleur d’accent Windows pour les onglets et la barre d’outils",
+      "ko": "탭과 도구 모음에 Windows 강조 색 사용",
+      "ko_KR": "탭과 도구 모음에 Windows 강조 색 사용",
+      "pt_BR": "Usar a cor de destaque do Windows nas abas e na barra de ferramentas",
+      "id": 3117 }
+    ,
     "cbTaskbarOverlay": {
       "en": "Show overlay icon (Win7 and higher)",
       "ru": "Показать значок наложения (Win7 и выше)",

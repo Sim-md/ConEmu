@@ -114,7 +114,9 @@ bool CDwmHelper::UpdateConsoleCaptionColors(HWND window)
 
 	COLORREF background = DefaultCaptionColor;
 	COLORREF foreground = DefaultCaptionColor;
-	DarkMode::GetConsoleChromeColors(background, foreground);
+	// In Windows-accent mode leave the native caption colors to Windows.
+	if (!gpSet || !gpSet->isTabsUseWindowsAccent)
+		DarkMode::GetConsoleChromeColors(background, foreground);
 	if (background == captionBackground_ && foreground == captionForeground_)
 		return false;
 

@@ -92,12 +92,9 @@ static TabPalette GetTabPalette()
 	if (gpSet && gpSet->isTabsUseWindowsAccent)
 	{
 		const auto accent = CDwmHelper::WindowsAccentColor();
-		const auto strip = dark ? CDwmHelper::BlendColors(DarkMode::Background, accent, 20) : accent;
-		const auto inactive = dark ? CDwmHelper::BlendColors(RGB(38, 38, 38), accent, 20)
-			: CDwmHelper::BlendColors(accent, RGB(255, 255, 255), 20);
-		const auto active = dark ? CDwmHelper::BlendColors(DarkMode::Control, accent, 30)
-			: CDwmHelper::BlendColors(accent, RGB(0, 0, 0), 35);
-		return {strip, inactive, active, ContrastingText(inactive), ContrastingText(active), ContrastingText(strip)};
+		const auto inactive = CDwmHelper::BlendColors(accent, dark ? RGB(0, 0, 0) : RGB(255, 255, 255), 20);
+		const auto active = CDwmHelper::BlendColors(accent, dark ? RGB(255, 255, 255) : RGB(0, 0, 0), 35);
+		return {accent, inactive, active, ContrastingText(inactive), ContrastingText(active), ContrastingText(accent)};
 	}
 	if (dark)
 		return {DarkMode::Background, RGB(38, 38, 38), DarkMode::Control,
@@ -128,7 +125,7 @@ static void PaintConsoleTabs(HWND tabs, HDC dc)
 	const auto alternate = highContrast ? GetSysColor(COLOR_WINDOW)
 		: CDwmHelper::BlendColors(colors.inactive, colors.text, 7);
 	const auto alternateText = highContrast ? GetSysColor(COLOR_WINDOWTEXT)
-		: CDwmHelper::IsWindowsDarkMode() ? DarkMode::Text : ContrastingText(alternate);
+		: ContrastingText(alternate);
 	POINT cursor = {};
 	GetCursorPos(&cursor);
 	ScreenToClient(tabs, &cursor);
@@ -154,11 +151,11 @@ static void PaintConsoleTabs(HWND tabs, HDC dc)
 		const bool isSelected = (i == selected);
 		const int height = item.bottom - item.top;
 		--item.right;
+		const bool hovered = dark && !isSelected && PtInRect(&item, cursor);
 		const auto background = isSelected ? colors.active
-			: (dark && PtInRect(&item, cursor) ? DarkMode::Hover
-				: (i % 2 == 0 ? colors.inactive : alternate));
+			: hovered ? DarkMode::Hover : (i % 2 == 0 ? colors.inactive : alternate);
 		const auto foreground = isSelected ? colors.activeText
-			: (i % 2 == 0 ? colors.text : alternateText);
+			: hovered ? ContrastingText(background) : (i % 2 == 0 ? colors.text : alternateText);
 		SetDCBrushColor(dc, background);
 		FillRect(dc, &item, brush);
 		if (isSelected || (info.dwState & TCIS_HIGHLIGHTED))
@@ -315,6 +312,7 @@ static void PaintConsoleToolbar(HWND toolbar, HDC dc)
 	if (icons)
 		ImageList_GetIconSize(icons, &iconWidth, &iconHeight);
 	const bool dark = CDwmHelper::IsWindowsDarkMode();
+	const bool useDarkGlyphs = dark && (!gpSet || !gpSet->isTabsUseWindowsAccent);
 	const auto hot = SendMessage(toolbar, TB_GETHOTITEM, 0, 0);
 	const auto count = SendMessage(toolbar, TB_BUTTONCOUNT, 0, 0);
 	for (int i = 0; i < count; ++i)
@@ -333,8 +331,9 @@ static void PaintConsoleToolbar(HWND toolbar, HDC dc)
 		const bool highlighted = pressed || checked || hovered;
 		const auto background = !highlighted ? colors.strip : dark && pressed ? RGB(80, 80, 80)
 			: dark && hovered ? DarkMode::Hover : colors.active;
-		const auto foreground = dark && !enabled ? DarkMode::Hint
-			: highlighted ? colors.activeText : colors.stripText;
+		const auto foreground = enabled || !dark
+			? (highlighted ? ContrastingText(background) : colors.stripText)
+			: CDwmHelper::BlendColors(background, colors.stripText, 50);
 		if (highlighted)
 			FillRect(dc, &item, DarkMode::Brush(dc, background));
 
@@ -343,7 +342,7 @@ static void PaintConsoleToolbar(HWND toolbar, HDC dc)
 		const int centerY = (item.top + item.bottom) / 2;
 		const int x = (item.left + item.right - arrowWidth - iconWidth) / 2;
 		if (icons && button.iBitmap >= 0
-			&& (!dark || iconWidth < 12 || !PaintToolbarGlyph(dc, x, centerY - iconWidth / 2, iconWidth,
+			&& (!useDarkGlyphs || iconWidth < 12 || !PaintToolbarGlyph(dc, x, centerY - iconWidth / 2, iconWidth,
 				button.idCommand, button.iBitmap, background, foreground)))
 		{
 			ImageList_Draw(icons, button.iBitmap, dc, x, centerY - iconHeight / 2,
