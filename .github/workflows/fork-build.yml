@@ -130,7 +130,7 @@ jobs:
           if ($result -ne 0) { exit $result }
 
   package:
-    if: github.repository == 'Sim-md/ConEmu' && github.ref == 'refs/heads/main'
+    if: github.repository == 'Sim-md/ConEmu'
     needs: [intel, arm64-tests]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -202,6 +202,7 @@ jobs:
           & .github/scripts/test-fork-update.ps1 -Archive $archive -Architecture ${{ matrix.arch }} -HookProbe "$env:RUNNER_TEMP/HookUpdateProbe.exe"
 
   release:
+    if: github.ref == 'refs/heads/main'
     needs: [package, updates]
     runs-on: ubuntu-24.04
     timeout-minutes: 10

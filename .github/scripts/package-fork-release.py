@@ -53,7 +53,8 @@ def package(artifacts, output, sha, arch, version):
         name = f"Thumbs/{decoder}.t{'32' if arch == 'x86' else '64'}"
         add_binary(files, build, f"{plugin_source}/{name}", f"Plugins/ConEmu/{name}", arch)
 
-    for name in ("ConEmu.l10n", "License.txt", "Scripts/ConEmu.NoHooks.bash", "Scripts/ConEmu.NoHooks.psm1"):
+    for name in ("ConEmu.l10n", "License.txt", "DarkMode-LICENSE.txt",
+                 "Scripts/ConEmu.NoHooks.bash", "Scripts/ConEmu.NoHooks.psm1"):
         files[f"ConEmu/{name}"] = Path("Release/ConEmu") / name
     updater = "ConEmu/Scripts/ForkUpdate.ps1"
     files[updater] = Path("Release") / updater
