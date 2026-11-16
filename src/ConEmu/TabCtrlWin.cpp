@@ -104,6 +104,30 @@ static TabPalette GetTabPalette()
 		GetSysColor(COLOR_BTNTEXT), GetSysColor(COLOR_WINDOWTEXT), GetSysColor(COLOR_BTNTEXT)};
 }
 
+static void PaintTabBarBuffered(HWND window, HDC target, const RECT& dirty, void (*paint)(HWND, HDC))
+{
+	if (IsRectEmpty(&dirty))
+		return;
+	RECT client = {};
+	GetClientRect(window, &client);
+	const HDC buffer = CreateCompatibleDC(target);
+	const HBITMAP bitmap = buffer ? CreateCompatibleBitmap(target, client.right, client.bottom) : nullptr;
+	const auto previous = bitmap ? SelectObject(buffer, bitmap) : nullptr;
+	if (previous)
+	{
+		paint(window, buffer);
+		BitBlt(target, dirty.left, dirty.top, RectWidth(dirty), RectHeight(dirty),
+			buffer, dirty.left, dirty.top, SRCCOPY);
+		SelectObject(buffer, previous);
+	}
+	else
+	{
+		paint(window, target);
+	}
+	if (bitmap) DeleteObject(bitmap);
+	if (buffer) DeleteDC(buffer);
+}
+
 static void PaintConsoleTabs(HWND tabs, HDC dc)
 {
 	const auto colors = GetTabPalette();
@@ -152,8 +176,10 @@ static void PaintConsoleTabs(HWND tabs, HDC dc)
 		const int height = item.bottom - item.top;
 		--item.right;
 		const bool hovered = dark && !isSelected && PtInRect(&item, cursor);
-		const auto background = isSelected ? colors.active
-			: hovered ? DarkMode::Hover : (i % 2 == 0 ? colors.inactive : alternate);
+		const auto normal = i % 2 == 0 ? colors.inactive : alternate;
+		const auto hover = gpSet->isTabsUseWindowsAccent
+			? CDwmHelper::BlendColors(normal, colors.active, 50) : DarkMode::Hover;
+		const auto background = isSelected ? colors.active : hovered ? hover : normal;
 		const auto foreground = isSelected ? colors.activeText
 			: hovered ? ContrastingText(background) : (i % 2 == 0 ? colors.text : alternateText);
 		SetDCBrushColor(dc, background);
@@ -329,8 +355,11 @@ static void PaintConsoleToolbar(HWND toolbar, HDC dc)
 		const bool checked = (button.fsState & TBSTATE_CHECKED) != 0;
 		const bool hovered = enabled && i == hot;
 		const bool highlighted = pressed || checked || hovered;
-		const auto background = !highlighted ? colors.strip : dark && pressed ? RGB(80, 80, 80)
-			: dark && hovered ? DarkMode::Hover : colors.active;
+		const auto background = !highlighted ? colors.strip
+			: useDarkGlyphs && pressed ? RGB(80, 80, 80)
+			: useDarkGlyphs && hovered ? DarkMode::Hover
+			: hovered && !pressed && !checked && gpSet && gpSet->isTabsUseWindowsAccent && !CDwmHelper::IsHighContrast()
+				? CDwmHelper::BlendColors(colors.strip, colors.active, 55) : colors.active;
 		const auto foreground = enabled || !dark
 			? (highlighted ? ContrastingText(background) : colors.stripText)
 			: CDwmHelper::BlendColors(background, colors.stripText, 50);
@@ -529,7 +558,7 @@ LRESULT CTabPanelWin::TabProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			PAINTSTRUCT paint = {};
 			if (const auto dc = BeginPaint(hwnd, &paint))
 			{
-				PaintConsoleTabs(hwnd, dc);
+				PaintTabBarBuffered(hwnd, dc, paint.rcPaint, PaintConsoleTabs);
 				EndPaint(hwnd, &paint);
 			}
 			return 0;
@@ -636,7 +665,7 @@ LRESULT CTabPanelWin::ToolProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 			PAINTSTRUCT paint = {};
 			if (const auto dc = BeginPaint(hwnd, &paint))
 			{
-				PaintConsoleToolbar(hwnd, dc);
+				PaintTabBarBuffered(hwnd, dc, paint.rcPaint, PaintConsoleToolbar);
 				EndPaint(hwnd, &paint);
 			}
 			return 0;
@@ -954,9 +983,9 @@ HWND CTabPanelWin::CreateToolbar()
 		return mh_Toolbar; // Уже создали
 
 	mh_Toolbar = CreateWindowEx(0, TOOLBARCLASSNAME, nullptr,
-	                            WS_CHILD|WS_VISIBLE|
+	                            WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|
 	                            TBSTYLE_FLAT|CCS_NOPARENTALIGN|CCS_NORESIZE|CCS_NODIVIDER|
-	                            TBSTYLE_TOOLTIPS|TBSTYLE_TRANSPARENT,
+	                            TBSTYLE_TOOLTIPS,
 	                            0, 0, 0, 0, mh_Rebar,
 	                            nullptr, nullptr, nullptr);
 
