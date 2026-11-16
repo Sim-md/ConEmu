@@ -143,7 +143,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
-      - name: Package and verify all three ZIPs
+      - name: Package and verify release ZIPs
         id: package
         run: |
           mkdir -p artifacts/arm64
@@ -199,6 +199,9 @@ jobs:
         shell: powershell
         run: |
           $archive = (Get-ChildItem dist -Filter '*-${{ matrix.arch }}.zip').FullName
+          if (!$archive -and '${{ matrix.arch }}' -ne 'arm64') {
+            $archive = (Get-ChildItem dist -Filter '*-x86-x64.zip').FullName
+          }
           & .github/scripts/test-fork-update.ps1 -Archive $archive -Architecture ${{ matrix.arch }} -HookProbe "$env:RUNNER_TEMP/HookUpdateProbe.exe"
 
   release:
@@ -233,4 +236,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh auth setup-git
-          bash .github/scripts/publish-update-feed.sh dist/version.ini
+          bash .github/scripts/publish-update-feed.sh dist/version.ini update-feed-v2
+          if compgen -G 'dist/*-x86.zip' > /dev/null; then
+            bash .github/scripts/publish-update-feed.sh dist/version.ini update-feed
+          fi

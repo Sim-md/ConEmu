@@ -41,14 +41,15 @@ ConEmuUpdateSettings::ConEmuUpdateSettings()
 LPCWSTR ConEmuUpdateSettings::UpdateVerLocation() const
 {
 	if (szUpdateVerLocation && *szUpdateVerLocation
-		&& lstrcmpi(szUpdateVerLocation, L"https://conemu.github.io/version.ini") != 0)
+		&& lstrcmpi(szUpdateVerLocation, L"https://conemu.github.io/version.ini") != 0
+		&& lstrcmpi(szUpdateVerLocation, L"https://raw.githubusercontent.com/Sim-md/ConEmu/update-feed/version.ini") != 0)
 		return szUpdateVerLocation;
 	return UpdateVerLocationDefault();
 }
 
 LPCWSTR ConEmuUpdateSettings::UpdateVerLocationDefault()
 {
-	return L"https://raw.githubusercontent.com/Sim-md/ConEmu/update-feed/version.ini";
+	return L"https://raw.githubusercontent.com/Sim-md/ConEmu/update-feed-v2/version.ini";
 }
 
 bool ConEmuUpdateSettings::UsesForkUpdateFeed() const

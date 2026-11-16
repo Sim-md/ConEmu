@@ -24,28 +24,34 @@ function Get-FileHash {
     throw 'Get-FileHash is intentionally unavailable to the installer in this test.'
 }
 
-# Give the fixture an older Windows file version by editing its VS_FIXEDFILEINFO.
-$bytes = [IO.File]::ReadAllBytes($guiPath)
-$fixedVersion = -1
-$signature = [Convert]::ToUInt32('feef04bd', 16)
-for ($i = 0; $i -lt $bytes.Length - 24; $i += 4) {
-    if ([BitConverter]::ToUInt32($bytes, $i) -eq $signature -and
-        [BitConverter]::ToUInt32($bytes, $i + 4) -eq 0x10000) {
-        $fixedVersion = $i
-        break
+# Give each installed launcher an older Windows file version.
+function Set-OldTestVersion([string]$Path) {
+    $bytes = [IO.File]::ReadAllBytes($Path)
+    $fixedVersion = -1
+    $signature = [Convert]::ToUInt32('feef04bd', 16)
+    for ($i = 0; $i -lt $bytes.Length - 24; $i += 4) {
+        if ([BitConverter]::ToUInt32($bytes, $i) -eq $signature -and
+            [BitConverter]::ToUInt32($bytes, $i + 4) -eq 0x10000) {
+            $fixedVersion = $i
+            break
+        }
     }
+    if ($fixedVersion -lt 0) { throw 'Cannot find executable version resource' }
+    [BitConverter]::GetBytes([uint32]0x00160001).CopyTo($bytes, $fixedVersion + 8)
+    [BitConverter]::GetBytes([uint32]0x00010000).CopyTo($bytes, $fixedVersion + 12)
+    [IO.File]::WriteAllBytes($Path, $bytes)
+    if ((Get-PackageBuild $Path) -ne '220101') { throw 'Cannot construct old executable fixture' }
 }
-if ($fixedVersion -lt 0) { throw 'Cannot find executable version resource' }
-[BitConverter]::GetBytes([uint32]0x00160001).CopyTo($bytes, $fixedVersion + 8)
-[BitConverter]::GetBytes([uint32]0x00010000).CopyTo($bytes, $fixedVersion + 12)
-[IO.File]::WriteAllBytes($guiPath, $bytes)
-if ((Get-PackageBuild $guiPath) -ne '220101') { throw 'Cannot construct old executable fixture' }
+foreach ($launcher in $launcherFiles) {
+    Set-OldTestVersion (Join-Path $root $launcher)
+}
 $sentinels = @('Far.exe', 'ConEmu/ConEmu.xml', 'Plugins/ConEmu/Background/Background.xml')
 foreach ($file in $sentinels) {
     [IO.File]::WriteAllText((Join-Path $root $file), "User fixture for $file")
 }
 
 function Get-State([string]$Directory, [string[]]$Files) {
+    if (!$Files) { return '' }
     ($Files | ForEach-Object { (Microsoft.PowerShell.Utility\Get-FileHash -LiteralPath (Join-Path $Directory $_)).Hash }) -join ','
 }
 
@@ -61,17 +67,17 @@ function Test-ExpectedFailure([scriptblock]$Operation, [string]$Pattern) {
 foreach ($name in $updateFiles[0..1]) {
     Add-Content -LiteralPath (Join-Path $root $name) -Value 'Older fixture'
 }
-$initial = Get-State $root ($updateFiles + $sentinels)
+$initial = Get-State $root ($installFiles + $sentinels)
 $settings = Get-State $root $sentinels
 Test-ExpectedFailure { Install-ForkUpdate $root $Archive ('0' * 64) $version } 'SHA-256'
-if ((Get-State $root ($updateFiles + $sentinels)) -ne $initial) { throw 'Bad checksum changed files' }
+if ((Get-State $root ($installFiles + $sentinels)) -ne $initial) { throw 'Bad checksum changed files' }
 'PASS invalid SHA-256 rejected before replacing files'
 
 $lockedFile = [IO.File]::Open((Join-Path $root $updateFiles[2]), 'Open', 'Read', 'None')
 try {
     Test-ExpectedFailure { Install-ForkUpdate $root $Archive $validHash $version } 'cannot access|being used|sharing'
 } finally { $lockedFile.Dispose() }
-if ((Get-State $root ($updateFiles + $sentinels)) -ne $initial) { throw 'Locked installation changed files' }
+if ((Get-State $root ($installFiles + $sentinels)) -ne $initial) { throw 'Locked installation changed files' }
 'PASS locked installation rejected before replacing files'
 
 $replace = (Get-Item Function:Set-UpdateFile).ScriptBlock
@@ -88,7 +94,7 @@ function Set-UpdateFile([string]$Source, [string]$Target, [string]$Backup) {
 }
 Test-ExpectedFailure { Install-ForkUpdate $root $Archive $validHash $version } 'cannot access|being used|sharing'
 Set-Item Function:Set-UpdateFile -Value $replace
-if ($script:completedReplacements -ne 2 -or (Get-State $root ($updateFiles + $sentinels)) -ne $initial) {
+if ($script:completedReplacements -ne 2 -or (Get-State $root ($installFiles + $sentinels)) -ne $initial) {
     throw 'Rollback did not restore the installation'
 }
 'PASS two replacements rolled back after a mid-install sharing violation'
@@ -100,7 +106,7 @@ $copiedGui = Join-Path $work 'test-staged.exe'
 [IO.File]::WriteAllText((Join-Path $work 'active'), $version)
 [IO.File]::Replace($copiedGui, $guiPath, $previousGui)
 Install-ForkUpdate -Root $root -RecoveryOnly
-if ((Get-State $root ($updateFiles + $sentinels)) -ne $initial) { throw 'Interrupted update was not restored' }
+if ((Get-State $root ($installFiles + $sentinels)) -ne $initial) { throw 'Interrupted update was not restored' }
 'PASS interrupted transaction recovered on the next run'
 
 $requiredPlugin = "Plugins/ConEmu/ConEmu$pluginSuffix"
@@ -108,8 +114,8 @@ $missingRequired = Join-Path $lab 'missing-required'
 Copy-Item -LiteralPath $root -Destination $missingRequired -Recurse
 [IO.File]::Delete((Join-Path $missingRequired $requiredPlugin))
 Test-ExpectedFailure { Install-ForkUpdate $missingRequired $Archive $validHash $version } 'Missing installed file:'
-if ((Get-State $missingRequired ($updateFiles | Where-Object { $_ -ne $requiredPlugin })) -ne
-    (Get-State $root ($updateFiles | Where-Object { $_ -ne $requiredPlugin }))) {
+if ((Get-State $missingRequired ($installFiles | Where-Object { $_ -ne $requiredPlugin })) -ne
+    (Get-State $root ($installFiles | Where-Object { $_ -ne $requiredPlugin }))) {
     throw 'Missing required plugin changed the installation'
 }
 'PASS missing main Far plugin stops the update'
@@ -127,7 +133,7 @@ foreach ($scenario in 'no-optional-plugins','only-lines','thumbnails-without-ico
     foreach ($name in $inactive) { [IO.File]::AppendAllText((Join-Path $destination $name), 'Stale decoder') }
     $inactiveState = Get-State $destination $inactive
     Install-ForkUpdate $destination $Archive $validHash $version
-    $present = $updateFiles | Where-Object { $_ -notin $absent -and $_ -notin $inactive }
+    $present = $installFiles | Where-Object { $_ -notin $absent -and $_ -notin $inactive }
     if ((Get-State $destination $present) -ne (Get-State $candidate $present) -or
         (Get-State $destination $sentinels) -ne $settings -or
         (Get-State $destination $inactive) -ne $inactiveState) {
@@ -139,8 +145,39 @@ foreach ($scenario in 'no-optional-plugins','only-lines','thumbnails-without-ico
     "PASS optional plugin layout preserved: $scenario"
 }
 
+if ($Architecture -ne 'arm64') {
+    $single = Join-Path $lab 'single-launcher'
+    Copy-Item -LiteralPath $root -Destination $single -Recurse
+    $absent = $installFiles | Where-Object { $_ -notin $updateFiles }
+    foreach ($name in $absent) { [IO.File]::Delete((Join-Path $single $name)) }
+    Install-ForkUpdate $single $Archive $validHash $version
+    if ((Get-State $single $updateFiles) -ne (Get-State $candidate $updateFiles)) {
+        throw 'Combined archive did not update a single-architecture installation'
+    }
+    foreach ($name in $absent) {
+        if ([IO.File]::Exists((Join-Path $single $name))) { throw "Added an uninstalled file: $name" }
+    }
+    'PASS combined ZIP updates a single launcher without adding the other architecture'
+
+    function Set-UpdateFile([string]$Source, [string]$Target, [string]$Backup) {
+        if ([IO.Path]::GetFileName($Target) -eq 'ConEmu64.exe') {
+            if ((Get-PackageBuild (Join-Path $root 'ConEmu.exe')) -ne $version) {
+                throw 'x86 launcher was not replaced first'
+            }
+            throw 'Injected failure before second launcher replacement'
+        }
+        & $replace $Source $Target $Backup
+    }
+    Test-ExpectedFailure { Install-ForkUpdate $root $Archive $validHash $version } 'Injected failure'
+    Set-Item Function:Set-UpdateFile -Value $replace
+    if ((Get-State $root ($installFiles + $sentinels)) -ne $initial) {
+        throw 'Rollback did not restore both launchers'
+    }
+    'PASS failure at the second launcher restores the first launcher and the shared files'
+}
+
 Install-ForkUpdate $root $Archive $validHash $version
-if ((Get-State $root $updateFiles) -ne (Get-State $candidate $updateFiles)) { throw 'Incomplete update' }
+if ((Get-State $root $installFiles) -ne (Get-State $candidate $installFiles)) { throw 'Incomplete update' }
 if ((Get-State $root $sentinels) -ne $settings) { throw 'Far or settings changed' }
 "PASS installed $version and preserved Far and both profiles"
 

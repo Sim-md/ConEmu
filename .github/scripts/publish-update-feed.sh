@@ -7,7 +7,10 @@ export GIT_COMMITTER_NAME=$GIT_AUTHOR_NAME
 export GIT_COMMITTER_EMAIL=$GIT_AUTHOR_EMAIL
 
 feed=$1
-ref=refs/heads/update-feed
+case "$2" in
+    update-feed|update-feed-v2) ref=refs/heads/$2 ;;
+    *) echo "Invalid update feed branch" >&2; exit 1 ;;
+esac
 version=$(sed -n 's/^version=//p' "$feed" | sort -u)
 [[ $version =~ ^[0-9]{6}[a-z]?$ ]]
 blob=$(git hash-object -w "$feed")

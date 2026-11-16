@@ -7,7 +7,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$feedUrl = 'https://raw.githubusercontent.com/Sim-md/ConEmu/update-feed/version.ini'
+$feedUrl = 'https://raw.githubusercontent.com/Sim-md/ConEmu/update-feed-v2/version.ini'
 $bits = if ($Architecture -eq 'x86') { '' } else { '64' }
 $pluginSuffix = @{x86='.dll'; x64='.x64.dll'; arm64='.arm64.dll'}[$Architecture]
 $thumbBits = if ($bits) { '64' } else { '32' }
@@ -40,6 +40,39 @@ $updateFiles = @(
     $gui
 )
 $machines[$gui] = $machine
+
+# The new journal uses the same file order regardless of which launcher starts it.
+$installFiles = $updateFiles
+$launcherFiles = @($gui)
+$optionalInstallFiles = $optionalPluginFiles
+$decoderOwners = @{}
+foreach ($decoder in $thumbDecoders) { $decoderOwners[$decoder] = $thumbPlugin }
+if ($Architecture -ne 'arm64') {
+    $installFiles = @($updateFiles | Select-Object -First 6)
+    foreach ($arch in 'x86','x64') {
+        $suffix = if ($arch -eq 'x86') { '.dll' } else { '.x64.dll' }
+        $bitsForArch = if ($arch -eq 'x86') { '' } else { '64' }
+        $decoderBits = if ($arch -eq 'x86') { '32' } else { '64' }
+        $launcher = "ConEmu$bitsForArch.exe"
+        $mainPlugin = "Plugins/ConEmu/ConEmu$suffix"
+        $thumb = "Plugins/ConEmu/Thumbs/ConEmuTh$suffix"
+        $plugins = @($mainPlugin, "Plugins/ConEmu/Background/ConEmuBg$suffix",
+            "Plugins/ConEmu/Lines/ConEmuLn$suffix", $thumb)
+        foreach ($name in 'gdi+','ico','pe') {
+            $decoder = "Plugins/ConEmu/Thumbs/$name.t$decoderBits"
+            $plugins += $decoder
+            $decoderOwners[$decoder] = $thumb
+        }
+        foreach ($name in ($plugins + $launcher)) {
+            $machines[$name] = if ($arch -eq 'x86') { 0x014c } else { 0x8664 }
+        }
+        $installFiles += $plugins
+        $optionalInstallFiles += $plugins | Where-Object { $_ -ne $mainPlugin }
+        if ($arch -ne $Architecture) { $optionalInstallFiles += @($mainPlugin, $launcher) }
+    }
+    $launcherFiles = @('ConEmu.exe','ConEmu64.exe')
+    $installFiles += @('ConEmu/ConEmu.l10n','ConEmu/Scripts/ForkUpdate.ps1') + $launcherFiles
+}
 
 function Assert-OrdinaryPath([string]$Path) {
     for ($item = $Path; $item; $item = [IO.Path]::GetDirectoryName($item)) {
@@ -93,16 +126,17 @@ function Set-UpdateFile([string]$Source, [string]$Target, [string]$Backup) {
     [IO.File]::Replace($Source, $Target, $Backup)
 }
 
-function Undo-ForkUpdate([string]$Root, [string]$Work) {
-    $active = Join-Path $Work 'active'
+function Undo-ForkUpdate([string]$Root, [string]$Work, [string[]]$Files, [string]$Prefix = '') {
+    $active = Join-Path $Work "${Prefix}active"
+    Assert-OrdinaryPath $active
     if (![IO.File]::Exists($active)) { return }
-    for ($i = $updateFiles.Count - 1; $i -ge 0; $i--) {
-        $backup = Join-Path $Work "$i.bak"
+    for ($i = $Files.Count - 1; $i -ge 0; $i--) {
+        $backup = Join-Path $Work "${Prefix}$i.bak"
         Assert-OrdinaryPath $backup
         if (![IO.File]::Exists($backup)) { continue }
-        $target = Join-Path $Root $updateFiles[$i]
+        $target = Join-Path $Root $Files[$i]
         Assert-OrdinaryPath $target
-        $restore = Join-Path $Work "$i.restore"
+        $restore = Join-Path $Work "${Prefix}$i.restore"
         Assert-OrdinaryPath $restore
         [IO.File]::Copy($backup, $restore, $true)
         if ([IO.File]::Exists($target)) {
@@ -124,17 +158,18 @@ function Install-ForkUpdate(
     Assert-OrdinaryPath $lockPath
     [void][IO.Directory]::CreateDirectory($work)
     $lock = [IO.File]::Open($lockPath, 'OpenOrCreate', 'ReadWrite', 'None')
-    $active = Join-Path $work 'active'
+    $active = Join-Path $work 'v2-active'
     try {
         Assert-OrdinaryPath $active
-        Undo-ForkUpdate $Root $work
+        Undo-ForkUpdate $Root $work $updateFiles
+        Undo-ForkUpdate $Root $work $installFiles 'v2-'
         if ($RecoveryOnly) { return }
 
         $localGui = Join-Path $Root $gui
         Assert-OrdinaryPath $localGui
         Assert-PeMachine $localGui $machines[$gui]
-        if (Test-Path -LiteralPath (Join-Path $Root $otherGui)) {
-            throw 'Both x86 and x64 launchers are installed here. Update this directory manually.'
+        if ($Architecture -eq 'arm64' -and (Test-Path -LiteralPath (Join-Path $Root $otherGui))) {
+            throw 'An Intel launcher is installed alongside the ARM64 build.'
         }
         if ($ExpectedVersion -cnotmatch '\A[0-9]{6}[a-z]?\z' -or
             [string]::CompareOrdinal($ExpectedVersion, (Get-PackageBuild $localGui)) -le 0) {
@@ -144,7 +179,6 @@ function Install-ForkUpdate(
         Add-Type -AssemblyName System.IO.Compression.FileSystem
         # Keep the original file indexes for recovery of interrupted updates.
         $stagedIndexes = [Collections.Generic.List[int]]::new()
-        $thumbInstalled = [IO.File]::Exists((Join-Path $Root $thumbPlugin))
         $stream = [IO.File]::Open($Archive, 'Open', 'Read', 'Read')
         try {
             if ($stream.Length -gt 128MB -or $Sha256 -notmatch '\A[0-9a-fA-F]{64}\z') {
@@ -157,14 +191,20 @@ function Install-ForkUpdate(
             $stream.Position = 0
             $zip = [IO.Compression.ZipArchive]::new($stream, 'Read', $true)
             try {
-                for ($i = 0; $i -lt $updateFiles.Count; $i++) {
-                    $name = $updateFiles[$i]
+                for ($i = 0; $i -lt $installFiles.Count; $i++) {
+                    $name = $installFiles[$i]
                     $target = Join-Path $Root $name
                     Assert-OrdinaryPath $target
-                    if (!$thumbInstalled -and $name -in $thumbDecoders) { continue }
+                    if ($decoderOwners.ContainsKey($name) -and ![IO.File]::Exists((Join-Path $Root $decoderOwners[$name]))) { continue }
                     if (![IO.File]::Exists($target)) {
-                        if ($name -in $optionalPluginFiles) { continue }
+                        if ($name -in $optionalInstallFiles) { continue }
                         throw "Missing installed file: $target"
+                    }
+                    if ($name -in $launcherFiles) {
+                        Assert-PeMachine $target $machines[$name]
+                        if ([string]::CompareOrdinal((Get-PackageBuild $target), $ExpectedVersion) -gt 0) {
+                            throw "The update would downgrade an installed launcher: $target"
+                        }
                     }
                     Wait-ForUpdateFile $target
                     $matchesInZip = @($zip.Entries | Where-Object FullName -ieq $name)
@@ -172,12 +212,12 @@ function Install-ForkUpdate(
                         $matchesInZip[0].Length -gt 64MB) {
                         throw "Missing, duplicate or oversized package entry: $name"
                     }
-                    $staged = Join-Path $work "$i.new"
+                    $staged = Join-Path $work "v2-$i.new"
                     Assert-OrdinaryPath $staged
-                    Assert-OrdinaryPath (Join-Path $work "$i.bak")
+                    Assert-OrdinaryPath (Join-Path $work "v2-$i.bak")
                     [IO.Compression.ZipFileExtensions]::ExtractToFile($matchesInZip[0], $staged, $true)
                     if ($machines.ContainsKey($name)) { Assert-PeMachine $staged $machines[$name] }
-                    if ($name -eq $gui -and (Get-PackageBuild $staged) -cne $ExpectedVersion) {
+                    if ($name -in $launcherFiles -and (Get-PackageBuild $staged) -cne $ExpectedVersion) {
                         throw 'The package executable version does not match the channel.'
                     }
                     $stagedIndexes.Add($i)
@@ -187,27 +227,27 @@ function Install-ForkUpdate(
             $stream.Dispose()
         }
 
-        for ($i = 0; $i -lt $updateFiles.Count; $i++) {
-            [IO.File]::Delete((Join-Path $work "$i.bak"))
+        for ($i = 0; $i -lt $installFiles.Count; $i++) {
+            [IO.File]::Delete((Join-Path $work "v2-$i.bak"))
         }
         [IO.File]::WriteAllText($active, $ExpectedVersion)
         try {
             foreach ($i in $stagedIndexes) {
-                Set-UpdateFile (Join-Path $work "$i.new") (Join-Path $Root $updateFiles[$i]) `
-                    (Join-Path $work "$i.bak")
+                Set-UpdateFile (Join-Path $work "v2-$i.new") (Join-Path $Root $installFiles[$i]) `
+                    (Join-Path $work "v2-$i.bak")
             }
             [IO.File]::Delete($active)
         } catch {
-            try { Undo-ForkUpdate $Root $work }
+            try { Undo-ForkUpdate $Root $work $installFiles 'v2-' }
             catch { throw "Rollback needs another attempt after Far and ConEmu close. Backups: $work. $_" }
             throw
         }
     } finally {
         try {
             if (![IO.File]::Exists($active)) {
-                for ($i = 0; $i -lt $updateFiles.Count; $i++) {
+                for ($i = 0; $i -lt $installFiles.Count; $i++) {
                     foreach ($extension in 'new','bak','restore') {
-                        [IO.File]::Delete((Join-Path $work "$i.$extension"))
+                        [IO.File]::Delete((Join-Path $work "v2-$i.$extension"))
                     }
                 }
             }
@@ -234,8 +274,9 @@ if ($MyInvocation.InvocationName -ne '.') {
             $section = [regex]::Match($feed, "(?m)^\[ConEmu_${Architecture}\]\r?\n([^\[]*)").Groups[1].Value
             $versionMatches = [regex]::Matches($section, '(?m)^version=([0-9]{6}[a-z]?)\r?$')
             $shaMatches = [regex]::Matches($section, '(?m)^sha256=([a-f0-9]{64})\r?$')
+            $packageSuffix = if ($Architecture -eq 'arm64') { 'arm64' } else { "(?:$Architecture|x86-x64)" }
             $urlMatches = [regex]::Matches($section,
-                "(?m)^url=(https://github\.com/Sim-md/ConEmu/releases/download/ci-[0-9a-f]{7}-[0-9]+-[0-9]+/ConEmu-[0-9]{6}[a-z]?-[0-9a-f]{7}-${Architecture}\.zip)\r?$")
+                "(?m)^url=(https://github\.com/Sim-md/ConEmu/releases/download/ci-[0-9a-f]{7}-[0-9]+-[0-9]+/ConEmu-[0-9]{6}[a-z]?-[0-9a-f]{7}-${packageSuffix}\.zip)\r?$")
             if ($versionMatches.Count -ne 1 -or $versionMatches[0].Groups[1].Value -cne $Version -or
                 $shaMatches.Count -ne 1 -or $urlMatches.Count -ne 1) {
                 throw 'The update channel changed or returned invalid metadata. Check for updates again.'

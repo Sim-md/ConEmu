@@ -30,28 +30,24 @@ def add_binary(files, root, source, destination, arch):
 def package(artifacts, output, sha, arch, version):
     files = {}
     arm = arch == "arm64"
-    build = artifacts / ("arm64/package" if arm else f"binaries-{arch}")
-    suffix = "" if arch == "x86" else "64"
-    gui = f"ConEmu{suffix}.exe"
-    add_binary(files, build, gui, gui, arch)
-
-    for runtime in ([arch] if arm else ["x86", "x64"]):
-        root = build if arm else artifacts / f"binaries-{runtime}"
+    runtimes = ("arm64",) if arm else ("x86", "x64")
+    for runtime in runtimes:
+        root = artifacts / ("arm64/package" if arm else f"binaries-{runtime}")
         bits = "" if runtime == "x86" else "64"
-        names = [f"ConEmuC{bits}.exe", f"ConEmuCD{bits}.dll"]
-        names.append(f"ConEmuHk{bits}.dll")
-        for name in names:
+        gui = f"ConEmu{bits}.exe"
+        add_binary(files, root, gui, gui, runtime)
+        for name in (f"ConEmuC{bits}.exe", f"ConEmuCD{bits}.dll", f"ConEmuHk{bits}.dll"):
             path = f"ConEmu/{name}"
             add_binary(files, root, path, path, runtime)
 
-    plugin_source = "Plugins/ConEmu" if arm else "plugins/ConEmu"
-    extension = {"arm64": ".arm64.dll", "x86": ".dll", "x64": ".x64.dll"}[arch]
-    for folder, plugin in PLUGINS.items():
-        name = folder + plugin + extension
-        add_binary(files, build, f"{plugin_source}/{name}", f"Plugins/ConEmu/{name}", arch)
-    for decoder in ("gdi+", "ico", "pe"):
-        name = f"Thumbs/{decoder}.t{'32' if arch == 'x86' else '64'}"
-        add_binary(files, build, f"{plugin_source}/{name}", f"Plugins/ConEmu/{name}", arch)
+        plugin_source = "Plugins/ConEmu" if arm else "plugins/ConEmu"
+        extension = {"arm64": ".arm64.dll", "x86": ".dll", "x64": ".x64.dll"}[runtime]
+        for folder, plugin in PLUGINS.items():
+            name = folder + plugin + extension
+            add_binary(files, root, f"{plugin_source}/{name}", f"Plugins/ConEmu/{name}", runtime)
+        for decoder in ("gdi+", "ico", "pe"):
+            name = f"Thumbs/{decoder}.t{32 if runtime == 'x86' else 64}"
+            add_binary(files, root, f"{plugin_source}/{name}", f"Plugins/ConEmu/{name}", runtime)
 
     for name in ("ConEmu.l10n", "License.txt", "DarkMode-LICENSE.txt",
                  "Scripts/ConEmu.NoHooks.bash", "Scripts/ConEmu.NoHooks.psm1"):
@@ -59,7 +55,7 @@ def package(artifacts, output, sha, arch, version):
     updater = "ConEmu/Scripts/ForkUpdate.ps1"
     files[updater] = Path("Release") / updater
     if arm:
-        files["ConEmu/Detours-LICENSE.txt"] = build / "ConEmu/Detours-LICENSE.txt"
+        files["ConEmu/Detours-LICENSE.txt"] = artifacts / "arm64/package/ConEmu/Detours-LICENSE.txt"
     files["ConEmu/Unicode-LICENSE.txt"] = Path("src/common/Unicode-LICENSE.txt")
     resources = Path("Release/plugins/ConEmu")
     for pattern in ("**/*.lng", "Background/Background.xml", "Background/img/*.png"):
@@ -101,15 +97,25 @@ def main():
         raise ValueError(f"Invalid CI release tag: {tag}")
     output.mkdir()
     version = release_version()
-    archives = [package(artifacts, output, sha, arch, version) for arch in MACHINES]
-    digests = {arch: hashlib.sha256(path.read_bytes()).hexdigest() for arch, path in zip(MACHINES, archives)}
-    checksums = [f"{digests[arch]}  {path.name}" for arch, path in zip(MACHINES, archives)]
+    # Keep the legacy filenames for the transition release. Both Intel archives
+    # contain the complete installation so either launcher can be updated.
+    bridge = version == "261116i"
+    arm = package(artifacts, output, sha, "arm64", version)
+    intel = package(artifacts, output, sha, "x86" if bridge else "x86-x64", version)
+    if bridge:
+        x64 = intel.with_name(intel.name.removesuffix("-x86.zip") + "-x64.zip")
+        x64.write_bytes(intel.read_bytes())
+    else:
+        x64 = intel
+    archives = {"arm64": arm, "x86": intel, "x64": x64}
+    digests = {path: hashlib.sha256(path.read_bytes()).hexdigest() for path in dict.fromkeys(archives.values())}
+    checksums = [f"{digest}  {path.name}" for path, digest in digests.items()]
     (output / "SHA256SUMS.txt").write_text("\n".join(checksums) + "\n", encoding="ascii")
     channels = ("Stable", "Preview", "Devel")
     feed = "\n".join(f"[ConEmu_{channel}_2]\nversion={version}\n" for channel in channels)
-    for arch, path in zip(MACHINES, archives):
+    for arch, path in archives.items():
         url = f"https://github.com/Sim-md/ConEmu/releases/download/{tag}/{path.name}"
-        feed += f"\n[ConEmu_{arch}]\nversion={version}\nsha256={digests[arch]}\nurl={url}\n"
+        feed += f"\n[ConEmu_{arch}]\nversion={version}\nsha256={digests[path]}\nurl={url}\n"
     (output / "version.ini").write_text(feed, encoding="ascii")
 
 
