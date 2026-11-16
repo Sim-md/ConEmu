@@ -97,18 +97,10 @@ def main():
         raise ValueError(f"Invalid CI release tag: {tag}")
     output.mkdir()
     version = release_version()
-    # Keep the legacy filenames for the transition release. Both Intel archives
-    # contain the complete installation so either launcher can be updated.
-    bridge = version == "261116i"
     arm = package(artifacts, output, sha, "arm64", version)
-    intel = package(artifacts, output, sha, "x86" if bridge else "x86-x64", version)
-    if bridge:
-        x64 = intel.with_name(intel.name.removesuffix("-x86.zip") + "-x64.zip")
-        x64.write_bytes(intel.read_bytes())
-    else:
-        x64 = intel
-    archives = {"arm64": arm, "x86": intel, "x64": x64}
-    digests = {path: hashlib.sha256(path.read_bytes()).hexdigest() for path in dict.fromkeys(archives.values())}
+    intel = package(artifacts, output, sha, "x86-x64", version)
+    archives = {"arm64": arm, "x86": intel, "x64": intel}
+    digests = {path: hashlib.sha256(path.read_bytes()).hexdigest() for path in (arm, intel)}
     checksums = [f"{digest}  {path.name}" for path, digest in digests.items()]
     (output / "SHA256SUMS.txt").write_text("\n".join(checksums) + "\n", encoding="ascii")
     channels = ("Stable", "Preview", "Devel")

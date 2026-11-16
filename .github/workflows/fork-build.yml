@@ -198,10 +198,8 @@ jobs:
       - name: Verify update, rollback and classic hook
         shell: powershell
         run: |
-          $archive = (Get-ChildItem dist -Filter '*-${{ matrix.arch }}.zip').FullName
-          if (!$archive -and '${{ matrix.arch }}' -ne 'arm64') {
-            $archive = (Get-ChildItem dist -Filter '*-x86-x64.zip').FullName
-          }
+          $package = if ('${{ matrix.arch }}' -eq 'arm64') { 'arm64' } else { 'x86-x64' }
+          $archive = (Get-ChildItem dist -Filter "*-$package.zip").FullName
           & .github/scripts/test-fork-update.ps1 -Archive $archive -Architecture ${{ matrix.arch }} -HookProbe "$env:RUNNER_TEMP/HookUpdateProbe.exe"
 
   release:
@@ -236,7 +234,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh auth setup-git
-          bash .github/scripts/publish-update-feed.sh dist/version.ini update-feed-v2
-          if compgen -G 'dist/*-x86.zip' > /dev/null; then
-            bash .github/scripts/publish-update-feed.sh dist/version.ini update-feed
-          fi
+          bash .github/scripts/publish-update-feed.sh dist/version.ini
