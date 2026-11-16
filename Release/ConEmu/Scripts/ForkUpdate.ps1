@@ -246,8 +246,24 @@ if ($MyInvocation.InvocationName -ne '.') {
             $message = "ConEmu $Version was installed. You can start ConEmu now."
         }
         if (!$Quiet) {
-            Add-Type -AssemblyName System.Windows.Forms
-            [void][Windows.Forms.MessageBox]::Show($message, 'ConEmu update')
+            Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+
+public static class ForkUpdateNotification
+{
+    [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    private static extern int MessageBoxW(IntPtr owner, string message, string caption, uint flags);
+
+    public static void ShowSuccess(string message)
+    {
+        const uint MB_ICONINFORMATION = 0x40;
+        const uint MB_SETFOREGROUND = 0x10000;
+        MessageBoxW(IntPtr.Zero, message, "ConEmu update", MB_ICONINFORMATION | MB_SETFOREGROUND);
+    }
+}
+'@
+            [ForkUpdateNotification]::ShowSuccess($message)
         }
     } catch {
         if (!$Quiet) {

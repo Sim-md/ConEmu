@@ -258,6 +258,7 @@ class CSettings
 		void ShowFontErrorTip(LPCTSTR asInfo);
 		void ShowModifierErrorTip(LPCTSTR asInfo, HWND hDlg, WORD nID);
 		void ShowConFontErrorTip();
+		static HWND SettingsDialogOwner();
 		static void ApplySettingsTheme(HWND dialog);
 		static INT_PTR SettingsThemeBrush(UINT message, HDC dc, HWND control, bool hyperlink = false);
 	protected:

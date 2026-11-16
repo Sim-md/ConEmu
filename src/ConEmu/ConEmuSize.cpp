@@ -7130,7 +7130,11 @@ void CConEmuSize::DoAlwaysOnTopSwitch()
 
 	CheckMenuItem(mp_ConEmu->mp_Menu->GetSysMenu(), ID_ALWAYSONTOP, MF_BYCOMMAND |
 	              (gpSet->isAlwaysOnTop ? MF_CHECKED : MF_UNCHECKED));
+	if (ghOpWnd && hwndAfter == HWND_TOPMOST && GetWindow(ghOpWnd, GW_OWNER) == ghWnd)
+		SetWindowLongPtr(ghOpWnd, GWLP_HWNDPARENT, 0);
 	setWindowPos(hwndAfter, 0,0,0,0, SWP_NOMOVE|SWP_NOSIZE);
+	if (ghOpWnd && hwndAfter == HWND_NOTOPMOST)
+		SetWindowLongPtr(ghOpWnd, GWLP_HWNDPARENT, reinterpret_cast<LONG_PTR>(CSettings::SettingsDialogOwner()));
 }
 
 void CConEmuSize::DoDesktopModeSwitch()

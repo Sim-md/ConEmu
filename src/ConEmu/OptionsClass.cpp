@@ -1753,6 +1753,13 @@ LRESULT CSettings::OnPage(LPNMHDR phdr)
 	return 0;
 }
 
+HWND CSettings::SettingsDialogOwner()
+{
+	// A topmost owner would also make its owned Settings window topmost.
+	return ghWnd && !(GetWindowLongPtr(ghWnd, GWL_STYLE) & WS_CHILD)
+		&& !(GetWindowLongPtr(ghWnd, GWL_EXSTYLE) & WS_EX_TOPMOST) ? ghWnd : nullptr;
+}
+
 /// IdShowPage is DialogID (IDD_SPG_FONTS, etc.)
 void CSettings::Dialog(int IdShowPage /*= 0*/)
 {
@@ -1777,7 +1784,7 @@ void CSettings::Dialog(int IdShowPage /*= 0*/)
 
 		SafeDelete(gpSetCls->mp_Dialog);
 		//2009-05-03. Нам нужен НЕмодальный диалог
-		gpSetCls->mp_Dialog = CDynDialog::ShowDialog(IDD_SETTINGS, nullptr, wndOpProc, 0/*dwInitParam*/);
+		gpSetCls->mp_Dialog = CDynDialog::ShowDialog(IDD_SETTINGS, SettingsDialogOwner(), wndOpProc, 0/*dwInitParam*/);
 
 		if (!gpSetCls->mp_Dialog)
 		{

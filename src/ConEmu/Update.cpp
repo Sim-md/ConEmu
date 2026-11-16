@@ -260,6 +260,11 @@ void CConEmuUpdate::StopChecking()
 	msz_PendingPackageFile.Release(true);
 }
 
+static HWND GetUpdateDialogOwner()
+{
+	return ghOpWnd && IsWindowVisible(ghOpWnd) ? ghOpWnd : ghWnd;
+}
+
 LRESULT CConEmuUpdate::ShowLastError(LPARAM apObj)
 {
 	_ASSERTE(gpUpd == (CConEmuUpdate*)apObj);
@@ -282,7 +287,7 @@ LRESULT CConEmuUpdate::ShowLastError(LPARAM apObj)
 	{
 		InterlockedIncrement(&gpUpd->mn_InShowMsgBox);
 
-		MsgBox(szError, MB_ICONINFORMATION, gpConEmu?gpConEmu->GetDefaultTitle():L"ConEmu Update");
+		MsgBox(szError, MB_ICONINFORMATION, gpConEmu?gpConEmu->GetDefaultTitle():L"ConEmu Update", GetUpdateDialogOwner());
 
 		InterlockedDecrement(&gpUpd->mn_InShowMsgBox);
 	}
@@ -1104,7 +1109,7 @@ LRESULT CConEmuUpdate::QueryRetryVersionCheck(LPARAM lParam)
 	{
 		InterlockedIncrement(&gpUpd->mn_InShowMsgBox);
 
-		lRc = MsgBox(szError, MB_ICONEXCLAMATION|MB_RETRYCANCEL, gpConEmu?gpConEmu->GetDefaultTitle():L"ConEmu Update");
+		lRc = MsgBox(szError, MB_ICONEXCLAMATION|MB_RETRYCANCEL, gpConEmu?gpConEmu->GetDefaultTitle():L"ConEmu Update", GetUpdateDialogOwner());
 
 		InterlockedDecrement(&gpUpd->mn_InShowMsgBox);
 	}
@@ -1737,20 +1742,20 @@ int CConEmuUpdate::QueryConfirmation(CConEmuUpdate::UpdateStep step)
 				{
 #if defined(CONEMU_ARM64_HOOKS) || defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || defined(__x86_64__)
 					const CEStr prompt(message, L"\n\nClose Far and ConEmu and install the update?");
-					if (MsgBox(prompt, MB_ICONINFORMATION | MB_YESNO | MB_DEFBUTTON2, ms_DefaultTitle) == IDYES)
+					if (MsgBox(prompt, MB_ICONINFORMATION | MB_YESNO | MB_DEFBUTTON2, ms_DefaultTitle, GetUpdateDialogOwner()) == IDYES)
 					{
 						wchar_t systemPath[MAX_PATH]{};
 						const auto length = GetSystemDirectory(systemPath, countof(systemPath));
 						const CEStr script(gpConEmu->ms_ConEmuExeDir, L"\\ConEmu\\Scripts\\ForkUpdate.ps1");
 						if (!length || length >= countof(systemPath) || !FileExists(script))
 						{
-							MsgBox(L"The bundled updater or Windows PowerShell is missing.", MB_ICONERROR, ms_DefaultTitle);
+							MsgBox(L"The bundled updater or Windows PowerShell is missing.", MB_ICONERROR, ms_DefaultTitle, GetUpdateDialogOwner());
 							break;
 						}
 						const CEStr powershell(systemPath, L"\\WindowsPowerShell\\v1.0\\powershell.exe");
 						if (!FileExists(powershell))
 						{
-							MsgBox(L"Windows PowerShell is missing.", MB_ICONERROR, ms_DefaultTitle);
+							MsgBox(L"Windows PowerShell is missing.", MB_ICONERROR, ms_DefaultTitle, GetUpdateDialogOwner());
 							break;
 						}
 
@@ -1762,7 +1767,7 @@ int CConEmuUpdate::QueryConfirmation(CConEmuUpdate::UpdateStep step)
 					}
 #else
 					const CEStr prompt(message, L"\n\nOpen the releases page?\n", gsDownlPage);
-					if (MsgBox(prompt, MB_ICONINFORMATION | MB_YESNO, ms_DefaultTitle) == IDYES)
+					if (MsgBox(prompt, MB_ICONINFORMATION | MB_YESNO, ms_DefaultTitle, GetUpdateDialogOwner()) == IDYES)
 						ConEmuAbout::OnInfo_DownloadPage();
 #endif
 				}
@@ -1937,7 +1942,7 @@ int CConEmuUpdate::QueryConfirmationDownload()
 	tsk.pButtons       = btns;
 	tsk.cButtons       = countof(btns);
 
-	tsk.hwndParent     = ghWnd;
+	tsk.hwndParent     = GetUpdateDialogOwner();
 
 	hr = TaskDialog(&tsk, &iBtn, nullptr, nullptr);
 	if (hr == S_OK)
@@ -1961,7 +1966,7 @@ MsgOnly:
 			pszServerPath,
 			pszFile ? pszFile : L"");
 
-		iBtn = MsgBox(pszMsg, MB_SETFOREGROUND | MB_SYSTEMMODAL | MB_ICONQUESTION | MB_YESNO, ms_DefaultTitle, nullptr, false);
+		iBtn = MsgBox(pszMsg, MB_ICONQUESTION | MB_YESNO, ms_DefaultTitle, GetUpdateDialogOwner(), false);
 	}
 	else
 	{
@@ -2016,7 +2021,7 @@ int CConEmuUpdate::QueryConfirmationUpdate()
 	tsk.pButtons       = btns;
 	tsk.cButtons       = countof(btns);
 
-	tsk.hwndParent     = ghWnd;
+	tsk.hwndParent     = GetUpdateDialogOwner();
 
 	hr = TaskDialog(&tsk, &iBtn, nullptr, nullptr);
 	if (hr == S_OK)
@@ -2031,7 +2036,7 @@ MsgOnly:
 		mb_DroppedMode ? L"dropped" : (mp_Set->isUpdateUseBuilds == ConEmuUpdateSettings::Builds::Stable) ? L"new " CV_STABLE
 		: (mp_Set->isUpdateUseBuilds == ConEmuUpdateSettings::Builds::Preview) ? L"new " CV_PREVIEW : L"new " CV_DEVEL, ms_NewVersion);
 
-	iBtn = MsgBox(szMsg, MB_SETFOREGROUND|MB_SYSTEMMODAL|MB_ICONQUESTION|MB_YESNOCANCEL, ms_DefaultTitle, nullptr, false);
+	iBtn = MsgBox(szMsg, MB_ICONQUESTION|MB_YESNOCANCEL, ms_DefaultTitle, GetUpdateDialogOwner(), false);
 
 wrap:
 	InterlockedDecrement(&mn_InShowMsgBox);
@@ -2089,7 +2094,7 @@ int CConEmuUpdate::QueryConfirmationNoNewVer()
 	tsk.pButtons       = btns;
 	tsk.cButtons       = countof(btns);
 
-	tsk.hwndParent     = ghWnd;
+	tsk.hwndParent     = GetUpdateDialogOwner();
 
 	hr = TaskDialog(&tsk, &iBtn, nullptr, nullptr);
 	if (hr == S_OK)
@@ -2105,7 +2110,7 @@ MsgOnly:
 		L"Your current ConEmu version is ", ms_CurVerInfo, L"\n\n",
 		szInfo, szCurVer);
 
-	iBtn = MsgBox(szMsg, MB_SETFOREGROUND|MB_SYSTEMMODAL|MB_ICONINFORMATION|MB_OK, ms_DefaultTitle, nullptr, false);
+	iBtn = MsgBox(szMsg, MB_ICONINFORMATION|MB_OK, ms_DefaultTitle, GetUpdateDialogOwner(), false);
 
 wrap:
 	InterlockedDecrement(&mn_InShowMsgBox);
