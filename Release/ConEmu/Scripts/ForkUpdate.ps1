@@ -17,6 +17,11 @@ $otherGui = if ($bits) { 'ConEmu.exe' } else { 'ConEmu64.exe' }
 
 # Keep both runtimes, including hooks for console processes of either bitness.
 $machines = @{}
+$thumbPlugin = "Plugins/ConEmu/Thumbs/ConEmuTh$pluginSuffix"
+$thumbDecoders = @("Plugins/ConEmu/Thumbs/gdi+.t$thumbBits",
+    "Plugins/ConEmu/Thumbs/ico.t$thumbBits", "Plugins/ConEmu/Thumbs/pe.t$thumbBits")
+$optionalPluginFiles = @("Plugins/ConEmu/Background/ConEmuBg$pluginSuffix",
+    "Plugins/ConEmu/Lines/ConEmuLn$pluginSuffix", $thumbPlugin) + $thumbDecoders
 $runtimes = if ($Architecture -eq 'arm64') { @('64') } else { @('','64') }
 $updateFiles = @(
     foreach ($runtime in $runtimes) {
@@ -26,10 +31,7 @@ $updateFiles = @(
             $path
         }
     }
-    foreach ($name in "ConEmu$pluginSuffix","Background/ConEmuBg$pluginSuffix",
-        "Lines/ConEmuLn$pluginSuffix","Thumbs/ConEmuTh$pluginSuffix","Thumbs/gdi+.t$thumbBits",
-        "Thumbs/ico.t$thumbBits","Thumbs/pe.t$thumbBits") {
-        $path = "Plugins/ConEmu/$name"
+    foreach ($path in (@("Plugins/ConEmu/ConEmu$pluginSuffix") + $optionalPluginFiles)) {
         $machines[$path] = $machine
         $path
     }
@@ -140,6 +142,9 @@ function Install-ForkUpdate(
         }
         Add-Type -AssemblyName System.IO.Compression
         Add-Type -AssemblyName System.IO.Compression.FileSystem
+        # Keep the original file indexes for recovery of interrupted updates.
+        $stagedIndexes = [Collections.Generic.List[int]]::new()
+        $thumbInstalled = [IO.File]::Exists((Join-Path $Root $thumbPlugin))
         $stream = [IO.File]::Open($Archive, 'Open', 'Read', 'Read')
         try {
             if ($stream.Length -gt 128MB -or $Sha256 -notmatch '\A[0-9a-fA-F]{64}\z') {
@@ -156,7 +161,11 @@ function Install-ForkUpdate(
                     $name = $updateFiles[$i]
                     $target = Join-Path $Root $name
                     Assert-OrdinaryPath $target
-                    if (![IO.File]::Exists($target)) { throw "Missing installed file: $target" }
+                    if (!$thumbInstalled -and $name -in $thumbDecoders) { continue }
+                    if (![IO.File]::Exists($target)) {
+                        if ($name -in $optionalPluginFiles) { continue }
+                        throw "Missing installed file: $target"
+                    }
                     Wait-ForUpdateFile $target
                     $matchesInZip = @($zip.Entries | Where-Object FullName -ieq $name)
                     if ($matchesInZip.Count -ne 1 -or $matchesInZip[0].Length -le 0 -or
@@ -171,6 +180,7 @@ function Install-ForkUpdate(
                     if ($name -eq $gui -and (Get-PackageBuild $staged) -cne $ExpectedVersion) {
                         throw 'The package executable version does not match the channel.'
                     }
+                    $stagedIndexes.Add($i)
                 }
             } finally { $zip.Dispose() }
         } finally {
@@ -182,7 +192,7 @@ function Install-ForkUpdate(
         }
         [IO.File]::WriteAllText($active, $ExpectedVersion)
         try {
-            for ($i = 0; $i -lt $updateFiles.Count; $i++) {
+            foreach ($i in $stagedIndexes) {
                 Set-UpdateFile (Join-Path $work "$i.new") (Join-Path $Root $updateFiles[$i]) `
                     (Join-Path $work "$i.bak")
             }

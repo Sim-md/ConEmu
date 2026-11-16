@@ -103,6 +103,42 @@ Install-ForkUpdate -Root $root -RecoveryOnly
 if ((Get-State $root ($updateFiles + $sentinels)) -ne $initial) { throw 'Interrupted update was not restored' }
 'PASS interrupted transaction recovered on the next run'
 
+$requiredPlugin = "Plugins/ConEmu/ConEmu$pluginSuffix"
+$missingRequired = Join-Path $lab 'missing-required'
+Copy-Item -LiteralPath $root -Destination $missingRequired -Recurse
+[IO.File]::Delete((Join-Path $missingRequired $requiredPlugin))
+Test-ExpectedFailure { Install-ForkUpdate $missingRequired $Archive $validHash $version } 'Missing installed file:'
+if ((Get-State $missingRequired ($updateFiles | Where-Object { $_ -ne $requiredPlugin })) -ne
+    (Get-State $root ($updateFiles | Where-Object { $_ -ne $requiredPlugin }))) {
+    throw 'Missing required plugin changed the installation'
+}
+'PASS missing main Far plugin stops the update'
+
+foreach ($scenario in 'no-optional-plugins','only-lines','thumbnails-without-ico') {
+    $destination = Join-Path $lab $scenario
+    Copy-Item -LiteralPath $root -Destination $destination -Recurse
+    $absent = switch ($scenario) {
+        'no-optional-plugins' { $optionalPluginFiles }
+        'only-lines' { $optionalPluginFiles | Where-Object { $_ -notlike '*/ConEmuLn*' -and $_ -ne $thumbDecoders[0] } }
+        'thumbnails-without-ico' { $optionalPluginFiles | Where-Object { $_ -like '*/ConEmuBg*' -or $_ -like '*/ConEmuLn*' -or $_ -like '*/ico.t*' } }
+    }
+    foreach ($name in $absent) { [IO.File]::Delete((Join-Path $destination $name)) }
+    $inactive = if ($scenario -eq 'only-lines') { @($thumbDecoders[0]) } else { @() }
+    foreach ($name in $inactive) { [IO.File]::AppendAllText((Join-Path $destination $name), 'Stale decoder') }
+    $inactiveState = Get-State $destination $inactive
+    Install-ForkUpdate $destination $Archive $validHash $version
+    $present = $updateFiles | Where-Object { $_ -notin $absent -and $_ -notin $inactive }
+    if ((Get-State $destination $present) -ne (Get-State $candidate $present) -or
+        (Get-State $destination $sentinels) -ne $settings -or
+        (Get-State $destination $inactive) -ne $inactiveState) {
+        throw "Installed files or settings are incorrect for $scenario"
+    }
+    foreach ($name in $absent) {
+        if ([IO.File]::Exists((Join-Path $destination $name))) { throw "Restored an uninstalled plugin: $name" }
+    }
+    "PASS optional plugin layout preserved: $scenario"
+}
+
 Install-ForkUpdate $root $Archive $validHash $version
 if ((Get-State $root $updateFiles) -ne (Get-State $candidate $updateFiles)) { throw 'Incomplete update' }
 if ((Get-State $root $sentinels) -ne $settings) { throw 'Far or settings changed' }
