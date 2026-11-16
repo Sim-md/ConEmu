@@ -1,4 +1,4 @@
-﻿
+
 /*
 Copyright (c) 2009-present Maximus5
 All rights reserved.
@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SHOWDEBUGSTR
 
 #include "Header.h"
+#include "DarkMode.h"
 #include "version.h"
 
 #include <commctrl.h>
@@ -2046,208 +2047,13 @@ INT_PTR CSettings::ProcessTipHelp(HWND hWnd2, UINT messg, WPARAM wParam, LPARAM 
 
 static COLORREF SettingsBackground(bool field)
 {
-	return CDwmHelper::BlendColors(field ? RGB(40, 40, 40) : RGB(28, 28, 28),
-		CDwmHelper::WindowsAccentColor(), 18);
-}
-
-static LRESULT CALLBACK SettingsListHeaderProc(HWND list, UINT message, WPARAM wParam, LPARAM lParam,
-	UINT_PTR subclassId, DWORD_PTR)
-{
-	if (message == WM_NCDESTROY)
-		RemoveWindowSubclass(list, SettingsListHeaderProc, subclassId);
-
-	if (message == WM_NOTIFY && lParam)
-	{
-		const auto* draw = reinterpret_cast<const NMCUSTOMDRAW*>(lParam);
-		if (draw->hdr.code == NM_CUSTOMDRAW && draw->hdr.hwndFrom == ListView_GetHeader(list))
-		{
-			if (draw->dwDrawStage == CDDS_PREPAINT)
-				return CDRF_NOTIFYITEMDRAW;
-
-			if (draw->dwDrawStage == CDDS_ITEMPREPAINT)
-			{
-				wchar_t label[256] = {};
-				HDITEMW item = {};
-				item.mask = HDI_TEXT | HDI_FORMAT;
-				item.pszText = label;
-				item.cchTextMax = countof(label);
-				if (Header_GetItem(draw->hdr.hwndFrom, static_cast<int>(draw->dwItemSpec), &item)
-					&& (item.fmt & HDF_STRING)
-					&& !(item.fmt & (HDF_BITMAP | HDF_IMAGE | HDF_OWNERDRAW | HDF_SORTUP | HDF_SORTDOWN)))
-				{
-					const int saved = SaveDC(draw->hdc);
-					if (saved)
-					{
-						auto background = RGB(42, 42, 42);
-						if (draw->uItemState & (CDIS_SELECTED | CDIS_HOT))
-							background = RGB(60, 60, 60);
-						const auto brush = static_cast<HBRUSH>(GetStockObject(DC_BRUSH));
-						SetDCBrushColor(draw->hdc, background);
-						FillRect(draw->hdc, &draw->rc, brush);
-						RECT divider = draw->rc;
-						divider.left = divider.right - 1;
-						SetDCBrushColor(draw->hdc, RGB(64, 64, 64));
-						FillRect(draw->hdc, &divider, brush);
-
-						RECT text = draw->rc;
-						const int padding = GetSystemMetrics(SM_CXEDGE) * 3;
-						InflateRect(&text, -padding, 0);
-						UINT flags = DT_SINGLELINE | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX;
-						switch (item.fmt & HDF_JUSTIFYMASK)
-						{
-						case HDF_CENTER: flags |= DT_CENTER; break;
-						case HDF_RIGHT: flags |= DT_RIGHT; break;
-						default: flags |= DT_LEFT; break;
-						}
-						SetBkMode(draw->hdc, TRANSPARENT);
-						SetTextColor(draw->hdc, RGB(240, 240, 240));
-						if (const auto font = reinterpret_cast<HFONT>(SendMessage(draw->hdr.hwndFrom, WM_GETFONT, 0, 0)))
-							SelectObject(draw->hdc, font);
-						DrawTextW(draw->hdc, label, -1, &text, flags);
-						RestoreDC(draw->hdc, saved);
-						return CDRF_SKIPDEFAULT;
-					}
-				}
-			}
-		}
-	}
-	return DefSubclassProc(list, message, wParam, lParam);
-}
-
-static void PaintDisabledSettingsLabel(HWND control, HDC dc)
-{
-	RECT rect = {};
-	GetClientRect(control, &rect);
-	SetDCBrushColor(dc, SettingsBackground(false));
-	FillRect(dc, &rect, static_cast<HBRUSH>(GetStockObject(DC_BRUSH)));
-
-	const int length = GetWindowTextLength(control);
-	CEStr text;
-	if (length <= 0 || !text.GetBuffer(length + 1))
-		return;
-	GetWindowText(control, text.data(), length + 1);
-
-	const auto style = GetWindowLongPtr(control, GWL_STYLE);
-	const int saved = SaveDC(dc);
-	if (!saved)
-		return;
-	if (const auto font = reinterpret_cast<HFONT>(SendMessage(control, WM_GETFONT, 0, 0)))
-		SelectObject(dc, font);
-	SetBkMode(dc, TRANSPARENT);
-	SetTextColor(dc, RGB(157, 157, 157));
-	UINT format = DT_WORDBREAK;
-	if (style & SS_NOPREFIX)
-		format |= DT_NOPREFIX;
-	if ((style & SS_TYPEMASK) == SS_RIGHT)
-		format |= DT_RIGHT;
-	else if ((style & SS_TYPEMASK) == SS_CENTER)
-		format |= DT_CENTER;
-	DrawTextW(dc, text, -1, &rect, format);
-	RestoreDC(dc, saved);
-}
-
-static LRESULT CALLBACK SettingsLabelProc(HWND control, UINT message, WPARAM wParam, LPARAM lParam,
-	UINT_PTR subclassId, DWORD_PTR)
-{
-	if (message == WM_NCDESTROY)
-		RemoveWindowSubclass(control, SettingsLabelProc, subclassId);
-
-	if (message == WM_ENABLE)
-	{
-		const auto result = DefSubclassProc(control, message, wParam, lParam);
-		InvalidateRect(control, nullptr, FALSE);
-		return result;
-	}
-	if (!IsWindowEnabled(control))
-	{
-		if (message == WM_PAINT)
-		{
-			PAINTSTRUCT paint = {};
-			if (const auto dc = BeginPaint(control, &paint))
-				PaintDisabledSettingsLabel(control, dc);
-			EndPaint(control, &paint);
-			return 0;
-		}
-		if (message == WM_PRINTCLIENT)
-		{
-			PaintDisabledSettingsLabel(control, reinterpret_cast<HDC>(wParam));
-			return 0;
-		}
-	}
-	return DefSubclassProc(control, message, wParam, lParam);
-}
-
-static BOOL CALLBACK ApplySettingsThemeToControl(HWND control, LPARAM darkParam)
-{
-	const bool useDark = darkParam != 0;
-	wchar_t cls[32] = {};
-	GetClassNameW(control, cls, countof(cls));
-	if (_wcsicmp(cls, WC_STATICW) == 0)
-	{
-		const auto type = GetWindowLongPtr(control, GWL_STYLE) & SS_TYPEMASK;
-		if (type == SS_LEFT || type == SS_CENTER || type == SS_RIGHT)
-		{
-			if (useDark)
-				SetWindowSubclass(control, SettingsLabelProc, 0, 0);
-			else
-				RemoveWindowSubclass(control, SettingsLabelProc, 0);
-		}
-	}
-	const bool tree = _wcsicmp(cls, WC_TREEVIEWW) == 0;
-	const bool list = _wcsicmp(cls, WC_LISTVIEWW) == 0;
-	const bool combo = _wcsicmp(cls, L"ComboBox") == 0 || _wcsicmp(cls, L"Edit") == 0;
-	const bool button = _wcsicmp(cls, L"Button") == 0;
-	const bool hotkey = _wcsicmp(cls, HOTKEY_CLASSW) == 0;
-	const bool tabs = _wcsicmp(cls, WC_TABCONTROLW) == 0;
-	const bool listBox = _wcsicmp(cls, L"ListBox") == 0;
-	const bool scrollingEdit = _wcsicmp(cls, L"Edit") == 0
-		&& (GetWindowLongPtr(control, GWL_STYLE) & (WS_HSCROLL | WS_VSCROLL));
-	const bool modernTheme = gOSVer.dwBuildNumber >= 26300;
-	if (tree || list || combo || button || hotkey || listBox || tabs
-		|| _wcsicmp(cls, L"ScrollBar") == 0 || _wcsicmp(cls, TRACKBAR_CLASSW) == 0)
-	{
-		LPCWSTR theme = nullptr;
-		if (useDark)
-		{
-			theme = combo ? L"DarkMode_CFD" : L"DarkMode_Explorer";
-			if (modernTheme && (button || hotkey || listBox || scrollingEdit || tabs))
-				theme = L"DarkMode_DarkTheme";
-		}
-		gpConEmu->SetWindowTheme(control, theme, nullptr);
-	}
-
-	const auto bg = useDark ? SettingsBackground(true) : GetSysColor(COLOR_WINDOW);
-	const auto fg = useDark ? RGB(240, 240, 240) : GetSysColor(COLOR_WINDOWTEXT);
-	if (tree)
-	{
-		TreeView_SetBkColor(control, bg);
-		TreeView_SetTextColor(control, fg);
-		TreeView_SetLineColor(control, useDark ? RGB(128, 128, 128) : CLR_DEFAULT);
-	}
-	if (list)
-	{
-		ListView_SetBkColor(control, bg);
-		ListView_SetTextBkColor(control, bg);
-		ListView_SetTextColor(control, fg);
-		if (useDark)
-			SetWindowSubclass(control, SettingsListHeaderProc, 0, 0);
-		else
-			RemoveWindowSubclass(control, SettingsListHeaderProc, 0);
-		if (const auto header = ListView_GetHeader(control))
-			gpConEmu->SetWindowTheme(header, useDark
-				? (modernTheme ? L"DarkMode_DarkTheme" : L"DarkMode_ItemsView") : nullptr, nullptr);
-	}
-	return TRUE;
+	return field ? DarkMode::Control : DarkMode::Background;
 }
 
 void CSettings::ApplySettingsTheme(HWND dialog)
 {
 	gpConEmu->ApplyPopupMenuTheme(dialog);
-	const bool dark = CDwmHelper::IsWindowsDarkMode();
-	if ((GetWindowLongPtr(dialog, GWL_STYLE) & (WS_CHILD | WS_CAPTION)) == WS_CAPTION)
-		gpConEmu->SetDarkCaption(dialog, dark);
-	EnumChildWindows(dialog, ApplySettingsThemeToControl, dark);
-	RedrawWindow(dialog, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
+	DarkMode::ApplyDialog(dialog);
 }
 
 INT_PTR CSettings::SettingsThemeBrush(UINT message, HDC dc, HWND control, bool hyperlink)
@@ -2285,6 +2091,7 @@ INT_PTR CSettings::wndOpProc(HWND hWnd2, UINT messg, WPARAM wParam, LPARAM lPara
 	}
 
 	PatchMsgBoxIcon(hWnd2, messg, wParam, lParam);
+	if (DarkMode::ProcessDialogMessage(hWnd2, messg, wParam, lParam, lRc)) return lRc;
 
 	switch (messg)
 	{
@@ -2569,7 +2376,7 @@ INT_PTR CSettings::OnCtlColorStatic(HWND hDlg, HDC hdc, HWND hCtrl, WORD nCtrlId
 		return reinterpret_cast<INT_PTR>(hBrush);
 	}
 
-	return FALSE;
+	return reinterpret_cast<INT_PTR>(DarkMode::ControlColor(hCtrl, hdc, WM_CTLCOLORSTATIC));
 }
 
 INT_PTR CSettings::OnMeasureFontItem(HWND hWnd2, UINT messg, WPARAM wParam, LPARAM lParam)
