@@ -194,9 +194,9 @@ BEGIN
     GROUPBOX        "Console size and Window position",gbWindowSizePos,4,1,375,218
     EDITTEXT        tWndWidth,59,63,44,12,ES_AUTOHSCROLL
     EDITTEXT        tWndHeight,155,63,44,12,ES_AUTOHSCROLL
-    CONTROL         "Normal",rNormal,"Button",BS_AUTORADIOBUTTON | WS_GROUP,17,50,47,8
-    CONTROL         "Maximized",rMaximized,"Button",BS_AUTORADIOBUTTON,67,50,66,8
-    CONTROL         "Full screen",rFullScreen,"Button",BS_AUTORADIOBUTTON,137,50,75,8
+    CONTROL         "Normal",rNormal,"Button",BS_AUTORADIOBUTTON | WS_GROUP,17,50,52,8
+    CONTROL         "Maximized",rMaximized,"Button",BS_AUTORADIOBUTTON,72,50,66,8
+    CONTROL         "Full screen",rFullScreen,"Button",BS_AUTORADIOBUTTON,141,50,71,8
     PUSHBUTTON      "Apply",cbApplyPos,314,21,59,12
     RTEXT           "X:",stWindowPosX,231,65,9,8
     EDITTEXT        tWndX,245,63,51,12,ES_AUTOHSCROLL
@@ -255,8 +255,8 @@ BEGIN
     CONTROL         "Show search field in tab bar",cbMultiShowSearch,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,213,40,164,8
     GROUPBOX        "Appearance",gbFeatureAppear,4,60,375,28
     CONTROL         "Enhance progressbars and scrollbars",cbEnhanceGraphics,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,73,202,8
-    CONTROL         "Show balloon help tooltips",cbShowHelpTooltips,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,213,73,164,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,73,216,8
+    CONTROL         "Show balloon help tooltips",cbShowHelpTooltips,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,230,73,146,8
     GROUPBOX        "Scrollbar",gbShowScrollBar,4,103,375,43
     CONTROL         "Hide",rbScrollbarHide,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,116,48,8
     CONTROL         "Show",rbScrollbarShow,"Button",BS_AUTORADIOBUTTON,61,116,60,8
@@ -451,8 +451,8 @@ BEGIN
     EDITTEXT        tInsideShell,64,135,311,13,ES_AUTOHSCROLL
     LTEXT           "Icon file:",stIntgrInsideIcon,11,153,51,8
     EDITTEXT        tInsideIcon,64,151,311,13,ES_AUTOHSCROLL
-    CONTROL         "Sync dir",cbInsideSyncDir,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,171,51,10
-    EDITTEXT        tInsideSyncDir,64,168,136,13,ES_AUTOHSCROLL
+    CONTROL         "Sync dir",cbInsideSyncDir,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,171,71,10
+    EDITTEXT        tInsideSyncDir,84,168,116,13,ES_AUTOHSCROLL
     PUSHBUTTON      "Register",bInsideRegister,212,167,78,14
     PUSHBUTTON      "Unregister",bInsideUnregister,294,167,81,14
     LTEXT           "Use this if you want ConEmu act as a page of Windows Explorer window",stIntgrInsideNote,11,103,232,8
@@ -599,12 +599,12 @@ BEGIN
     CONTROL         "Active window transparency",cbTransparent,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,14,310,8
     RTEXT           "Transparent",stTransparentActive,7,30,51,8
     CONTROL         "",slTransparent,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,68,30,210,12
-    LTEXT           "Opaque",stOpaqueActive,287,30,31,8
+    LTEXT           "Opaque",stOpaqueActive,287,30,85,8
     CONTROL         "Use separate transparency value for inactive window",cbTransparentSeparate,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,47,310,10
     RTEXT           "Transparent",stTransparentInactive,7,62,51,8
     CONTROL         "",slTransparentInactive,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,68,62,210,12
-    LTEXT           "Opaque",stOpaqueInactive,287,62,31,8
+    LTEXT           "Opaque",stOpaqueInactive,287,62,85,8
     GROUPBOX        "Static transparency",gbStaticTransparency,4,86,375,46
     LTEXT           "",c38,160,98,20,12,SS_NOTIFY | SS_SUNKEN
     EDITTEXT        tc38,111,98,45,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_STATICEDGE
@@ -640,7 +640,7 @@ BEGIN
     GROUPBOX        "Performance counters",gbPerformance,4,1,375,30
     GROUPBOX        "Console states",IDC_CONSOLE_STATES,4,35,375,28
     GROUPBOX        "Processes",gbInfoProcesses,4,65,204,144
-    EDITTEXT        tsTopPID,40,45,69,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        tsTopPID,40,45,65,12,ES_AUTOHSCROLL | ES_READONLY
     LISTBOX         lbProcesses,9,76,194,127,NOT LBS_NOTIFY | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
     EDITTEXT        tPerfCounters,9,13,363,12,ES_AUTOHSCROLL | ES_READONLY
     GROUPBOX        "Current command line",gbInfoCmdLine,4,211,375,29
@@ -660,14 +660,14 @@ BEGIN
     EDITTEXT        tPanelRight,284,170,90,12,ES_AUTOHSCROLL | ES_READONLY
     RTEXT           "Main:",stVConFontMain,218,194,40,8
     EDITTEXT        tRealFontMain,262,192,46,12,ES_AUTOHSCROLL | ES_READONLY
-    RTEXT           "Fix:",stVConFontFix,310,194,29,8
+    RTEXT           "Fix:",stVConFontFix,309,194,33,8
     EDITTEXT        tRealFontBorders,343,192,31,12,ES_AUTOHSCROLL | ES_READONLY
     GROUPBOX        "Font",gbVConFont,214,183,165,26
     EDITTEXT        tCursorPos,284,138,90,12,ES_AUTOHSCROLL | ES_READONLY
     RTEXT           "Cursor (x,y,h):",stRConCursorInfo,217,140,66,8
     RTEXT           "Far PID:",stFarPID,8,47,29,8
-    RTEXT           "States:",stRConStates,113,47,36,8
-    EDITTEXT        tsRConFlags,152,45,222,12,ES_AUTOHSCROLL | ES_READONLY
+    RTEXT           "States:",stRConStates,110,47,45,8
+    EDITTEXT        tsRConFlags,158,45,216,12,ES_AUTOHSCROLL | ES_READONLY
 END
 
 IDD_SPG_FEATURES DIALOGEX 0, 0, 381, 242
@@ -957,11 +957,11 @@ BEGIN
     GROUPBOX        "Text selection",gbTextSelection,4,1,375,61
     CONTROL         "Freeze console contents before selection (may cause small lag)",cbCTSFreezeBeforeSelect,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,14,361,8
-    CONTROL         "Detect line ends",cbCTSDetectLineEnd,"Button",BS_AUTO3STATE | WS_TABSTOP,11,30,66,8
-    CONTROL         "Bash margin",cbCTSBashMargin,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,30,59,8
-    CONTROL         "Trim trailing spaces",cbCTSTrimTrailing,"Button",BS_AUTO3STATE | WS_TABSTOP,150,30,77,8
-    RTEXT           "EOL:",stCTSEOL,232,31,32,8
-    COMBOBOX        lbCTSEOL,270,28,47,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Detect line ends",cbCTSDetectLineEnd,"Button",BS_AUTO3STATE | WS_TABSTOP,11,30,75,8
+    CONTROL         "Bash margin",cbCTSBashMargin,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,92,30,62,8
+    CONTROL         "Trim trailing spaces",cbCTSTrimTrailing,"Button",BS_AUTO3STATE | WS_TABSTOP,158,30,110,8
+    RTEXT           "EOL:",stCTSEOL,272,31,26,8
+    COMBOBOX        lbCTSEOL,302,28,51,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     RTEXT           "Copying format:",stCopyFormat,10,47,71,8
     COMBOBOX        lbCopyFormat,86,44,120,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Color indexes",gbSelectColorIdx,4,67,375,30
@@ -979,9 +979,9 @@ BEGIN
     CONTROL         "Block (rectangular) selection",cbCTSBlockSelection,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,150,131,109,8
     COMBOBOX        lbCTSBlockSelection,262,129,55,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Copy on Left Button release",cbCTSAutoCopy,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,145,136,8
+    CONTROL         "Copy on Left Button release",cbCTSAutoCopy,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,145,142,8
     CONTROL         "Reset selection on Left Button release",cbCTSResetOnRelease,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,150,145,167,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,157,145,217,8
     CONTROL         "Show IBeam cursor",cbCTSIBeam,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,158,136,8
     GROUPBOX        "Select text with keyboard (Also there are two hotkeys on Keys&Macro page)",gbSelectKeyboard,4,177,375,52
     CONTROL         "Start selection with Shift+Arrow (Text = Left/Right/Home/End, Block = Up/Down)",cbCTSShiftArrowStartSel,
@@ -1057,7 +1057,7 @@ BEGIN
     RTEXT           "Back:",stStatusColorBack,13,41,26,8
     EDITTEXT        tc35,44,40,45,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_STATICEDGE
     LTEXT           "",c35,92,40,12,12,SS_NOTIFY | SS_SUNKEN
-    RTEXT           "Light:",stStatusColorLight,109,41,31,8
+    RTEXT           "Light:",stStatusColorLight,108,41,36,8
     EDITTEXT        tc36,145,40,45,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_STATICEDGE
     LTEXT           "",c36,193,40,12,12,SS_NOTIFY | SS_SUNKEN
     RTEXT           "Dark:",stStatusColorDark,209,41,36,8
@@ -1065,9 +1065,9 @@ BEGIN
     LTEXT           "",c37,298,40,12,12,SS_NOTIFY | SS_SUNKEN
     GROUPBOX        "Font and color",gbStatusFontColor,9,12,363,59
     RTEXT           "Lines:",stStatusLines,14,58,25,8
-    CONTROL         "Horizontal",cbStatusHorzSep,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,44,58,50,8
-    CONTROL         "Vertical",cbStatusVertSep,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,96,58,42,8
-    CONTROL         "System colors",cbStatusSystemColors,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,250,58,115,8
+    CONTROL         "Horizontal",cbStatusHorzSep,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,44,58,75,8
+    CONTROL         "Vertical",cbStatusVertSep,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,122,58,67,8
+    CONTROL         "System colors",cbStatusSystemColors,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,291,58,81,8
     LTEXT           "Available columns:",stStatusAvailCol,11,76,60,8
     LISTBOX         lbStatusAvailable,9,86,137,137,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
     LTEXT           "Selected columns:",stStatusSelCol,181,76,58,8
@@ -1076,7 +1076,7 @@ BEGIN
     PUSHBUTTON      ">",cbStatusAddSelected,151,111,23,14
     PUSHBUTTON      "<",cbStatusDelSelected,151,129,23,14
     PUSHBUTTON      "<<",cbStatusDelAll,151,145,23,14
-    CONTROL         "Use vertical padding",cbStatusVertPad,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,144,58,101,8
+    CONTROL         "Use vertical padding",cbStatusVertPad,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,192,58,96,8
 END
 
 IDD_SPG_VIEWS DIALOGEX 0, 0, 381, 319
@@ -1131,19 +1131,19 @@ BEGIN
     COMBOBOX        tThumbMaxZoom,52,133,44,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Use PicView2 for previews",cbThumbUsePicView2,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,102,134,107,10
     GROUPBOX        "Preview background",gbFarPreviewBg,9,148,101,45
-    CONTROL         "Color index",rbThumbBackColorIdx,"Button",BS_AUTORADIOBUTTON,15,161,52,10
+    CONTROL         "Color index",rbThumbBackColorIdx,"Button",BS_AUTORADIOBUTTON,15,161,55,10
     CONTROL         "RGB",rbThumbBackColorRGB,"Button",BS_AUTORADIOBUTTON,15,178,27,10
     COMBOBOX        lbThumbBackColorIdx,74,159,32,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "",c32,93,176,12,12,SS_NOTIFY | SS_SUNKEN
     EDITTEXT        tc32,45,176,45,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_STATICEDGE
     GROUPBOX        "",IDC_STATIC,113,148,100,45
-    CONTROL         "Color index",rbThumbPreviewBoxColorIdx,"Button",BS_AUTORADIOBUTTON,119,161,52,10
+    CONTROL         "Color index",rbThumbPreviewBoxColorIdx,"Button",BS_AUTORADIOBUTTON,119,161,55,10
     CONTROL         "RGB",rbThumbPreviewBoxColorRGB,"Button",BS_AUTORADIOBUTTON,119,178,27,10
     COMBOBOX        lbThumbPreviewBoxColorIdx,175,159,32,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "",c33,196,176,12,12,SS_NOTIFY | SS_SUNKEN
     EDITTEXT        tc33,148,176,45,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_STATICEDGE
     GROUPBOX        "",IDC_STATIC,216,148,102,45
-    CONTROL         "Color index",rbThumbSelectionBoxColorIdx,"Button",BS_AUTORADIOBUTTON,221,161,52,10
+    CONTROL         "Color index",rbThumbSelectionBoxColorIdx,"Button",BS_AUTORADIOBUTTON,221,161,55,10
     CONTROL         "RGB",rbThumbSelectionBoxColorRGB,"Button",BS_AUTORADIOBUTTON,221,178,28,10
     COMBOBOX        lbThumbSelectionBoxColorIdx,280,159,32,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "",c34,300,176,12,12,SS_NOTIFY | SS_SUNKEN
@@ -1284,13 +1284,13 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     GROUPBOX        "Update settings",gbUpdate,4,1,375,230
     LTEXT           "Do automatic check on",stUpdateCheck,10,13,87,8
-    CONTROL         "Startup",cbUpdateCheckOnStartup,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,104,13,51,8
-    CONTROL         "Hourly",cbUpdateCheckHourly,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,158,13,47,8
-    CONTROL         "TSA notification only",cbUpdateConfirmDownload,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,218,13,154,8
+    CONTROL         "Startup",cbUpdateCheckOnStartup,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,104,13,61,8
+    CONTROL         "Hourly",cbUpdateCheckHourly,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,169,13,65,8
+    CONTROL         "TSA notification only",cbUpdateConfirmDownload,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,239,13,134,8
     LTEXT           "Preferred release type",stUpdateReleaseType,10,28,87,8
-    CONTROL         "Stable",rbUpdateStableOnly,"Button",BS_AUTORADIOBUTTON,104,29,51,8
-    CONTROL         "Preview",rbUpdatePreview,"Button",BS_AUTORADIOBUTTON,159,29,51,8
-    CONTROL         "Latest",rbUpdateLatestAvailable,"Button",BS_AUTORADIOBUTTON,218,29,51,8
+    CONTROL         "Stable",rbUpdateStableOnly,"Button",BS_AUTORADIOBUTTON,104,29,61,8
+    CONTROL         "Preview",rbUpdatePreview,"Button",BS_AUTORADIOBUTTON,169,29,96,8
+    CONTROL         "Latest",rbUpdateLatestAvailable,"Button",BS_AUTORADIOBUTTON,270,29,103,8
     CONTROL         "External downloader",cbUpdateInetTool,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,45,87,10
     EDITTEXT        tUpdateInetTool,103,43,194,13,ES_AUTOHSCROLL
     PUSHBUTTON      "...",cbUpdateInetToolPath,302,43,15,13
@@ -1314,7 +1314,7 @@ BEGIN
     PUSHBUTTON      "...",cbUpdateArcCmdLine,301,153,15,13
     LTEXT           "Post-update command, don't forget ‘call’ for batches",stUpdatePostCommand,12,173,310,8
     EDITTEXT        tUpdatePostUpdateCmd,21,185,295,13,ES_AUTOHSCROLL
-    LTEXT           "ConEmu latest version location info",stUpdateVerLocation,12,201,199,8
+    LTEXT           "ConEmu latest version location info",stUpdateVerLocation,12,201,305,8
     EDITTEXT        tUpdateVerLocation,21,212,190,13,ES_AUTOHSCROLL
     PUSHBUTTON      "Apply && Check",cbUpdateCheck,219,211,98,15
 END
@@ -1372,7 +1372,7 @@ BEGIN
     GROUPBOX        "&Predefined tasks (command groups)",gbCmdTasks,4,1,375,238
     LISTBOX         lbCmdTasks,9,12,115,170,LBS_USETABSTOPS | LBS_NOINTEGRALHEIGHT | LBS_EXTENDEDSEL | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
     EDITTEXT        tCmdGroupName,129,12,97,12,ES_AUTOHSCROLL
-    LTEXT           "&Commands (application, arguments, ""-new_console"" params)\nDelimit commands with empty lines\nEach command creates tab in ConEmu when group started\nMark active console tab with '>' sign\nStart console 'As Administrator' with '*' sign",stCmdGroupCommands,132,81,208,41
+    LTEXT           "&Commands (application, arguments, ""-new_console"" params)\nDelimit commands with empty lines\nEach command creates tab in ConEmu when group started\nMark active console tab with '>' sign\nStart console 'As Administrator' with '*' sign",stCmdGroupCommands,132,81,241,41
     EDITTEXT        tCmdGroupCommands,129,125,245,93,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | WS_VSCROLL
     PUSHBUTTON      "&+",cbCmdTasksAdd,9,221,17,14
     PUSHBUTTON      "&-",cbCmdTasksDel,27,221,17,14
@@ -1383,11 +1383,11 @@ BEGIN
     PUSHBUTTON      "Clone",cbCmdTasksDup,74,204,50,14
     LTEXT           "Task parameters. Example: /dir ""C:\\"" /icon ""cmd.exe"" /single",stCmdGroupGuiArg,131,56,208,8
     EDITTEXT        tCmdGroupGuiArg,129,66,245,12,ES_AUTOHSCROLL
-    RTEXT           "Add:",stCmdTaskAdd,129,225,54,8
-    PUSHBUTTON      "Tab...",cbCmdGroupApp,188,221,34,14
-    PUSHBUTTON      "Startup dir...",cbCmdTasksDir,223,221,53,14
-    PUSHBUTTON      "File path...",cbCmdTasksParm,277,221,47,14
-    PUSHBUTTON      "Active tabs",cbCmdTasksActive,325,221,49,14
+    RTEXT           "Add:",stCmdTaskAdd,129,225,45,8
+    PUSHBUTTON      "Tab...",cbCmdGroupApp,176,221,44,14
+    PUSHBUTTON      "Startup dir...",cbCmdTasksDir,222,221,54,14
+    PUSHBUTTON      "File path...",cbCmdTasksParm,278,221,47,14
+    PUSHBUTTON      "Active tabs",cbCmdTasksActive,327,221,47,14
     RTEXT           "&Hotkey:",stCmdGroupKey,231,14,33,8
     EDITTEXT        tCmdGroupKey,268,12,85,12,ES_AUTOHSCROLL | ES_READONLY
     PUSHBUTTON      "...",cbCmdGroupKey,358,12,16,13
@@ -1456,9 +1456,9 @@ BEGIN
     CONTROL         "Change prompt (cmd, powershell) text cursor position with Left Click",cbCTSClickPromptPosition,
                     "Button",BS_AUTO3STATE | WS_TABSTOP,13,360,330,8
     CONTROL         "Detect line ends",cbCTSDetectLineEnd,"Button",BS_AUTO3STATE | WS_TABSTOP,13,236,90,8
-    CONTROL         "Bash margin",cbCTSBashMargin,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,105,236,71,8
-    CONTROL         "Trim trailing spaces",cbCTSTrimTrailing,"Button",BS_AUTO3STATE | WS_TABSTOP,183,236,99,8
-    RTEXT           "EOL:",stCTSEOL,275,236,25,8
+    CONTROL         "Bash margin",cbCTSBashMargin,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,105,236,65,8
+    CONTROL         "Trim trailing spaces",cbCTSTrimTrailing,"Button",BS_AUTO3STATE | WS_TABSTOP,174,236,105,8
+    RTEXT           "EOL:",stCTSEOL,280,236,22,8
     COMBOBOX        lbCTSEOL,304,233,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        tCursorFixedSize,98,74,40,12,ES_AUTOHSCROLL
     LTEXT           "(5-100) %",stCursorFixedSize,142,76,38,8

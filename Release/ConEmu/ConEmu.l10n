@@ -10140,7 +10140,7 @@
     ,
     "cbAnsiLog": {
       "en": "Log console output (*)",
-      "ru": "Логирование консольного вывода (*)",
+      "ru": "Журнал вывода (*)",
       "zh": "记录控制台输出 (*)",
       "de": "Ausgaben protokollieren (*)",
       "ja": "ログコンソール出力(*)",
@@ -10153,7 +10153,7 @@
     ,
     "cbAnsiLogCodes": {
       "en": "Log ANSI sequences (*)",
-      "ru": "Журнал ANSI последовательности (*)",
+      "ru": "Запись ANSI-последовательностей (*)",
       "zh": "记录 ANSI 序列 (*)",
       "de": "ANSI-Sequenzen protokollieren (*)",
       "es": "Registrar secuencias ANSI (*)",
@@ -10356,7 +10356,7 @@
     ,
     "cbCloseConEmuOnCrossClicking": {
       "en": "Quit on close (e.g. caption bar cross clicking)",
-      "ru": "Выйти при закрытии (например. щелчком на заголовке)",
+      "ru": "Выход по крестику окна",
       "zh": "关闭时退出程序 （比如 标题栏点击叉号）",
       "de": "Beim Beenden schließen (z.B. Schließen-Schaltfläche)",
       "ja": "閉じると終了(例:キャプションバーの[x]ボタン).",
@@ -10420,7 +10420,7 @@
     ,
     "cbCmdAutorunNewWnd": {
       "en": "Force new ConEmu window",
-      "ru": "Принудительно новое окно ConEmu",
+      "ru": "Открывать новое окно",
       "zh": "强制新建ConEmu窗口",
       "de": "Erzwinge neues ConEmu-Fenster",
       "ja": "新しいConEmuウィンドウを強制する",
@@ -10433,7 +10433,7 @@
     ,
     "cbCmdGroupApp": {
       "en": "Tab...",
-      "ru": "Вкладка...",
+      "ru": "Вкладка…",
       "zh": "标签...",
       "de": "Reiter...",
       "ja": "タブ...",
@@ -10536,7 +10536,7 @@
     ,
     "cbCmdTasksActive": {
       "en": "Active tabs",
-      "ru": "Активные вкладки",
+      "ru": "Вкладки",
       "zh": "活动标签",
       "de": "Aktive Reiter",
       "ja": "アクティブなタブ",
@@ -10549,7 +10549,7 @@
     ,
     "cbCmdTasksDir": {
       "en": "Startup dir...",
-      "ru": "Папка запуска...",
+      "ru": "Каталог…",
       "zh": "启动目录...",
       "de": "Startordner...",
       "ja": "開始時のディレクトリ...",
@@ -10588,7 +10588,7 @@
     ,
     "cbCmdTasksParm": {
       "en": "File path...",
-      "ru": "Путь к файлу...",
+      "ru": "Файл…",
       "zh": "文件路径...",
       "de": "Dateipfad...",
       "ja": "ファイルパス...",
@@ -10776,7 +10776,7 @@
     ,
     "cbCTSAutoCopy": {
       "en": "Copy on Left Button release",
-      "ru": "Копировать при отпускании левой кнопки",
+      "ru": "Копировать при отпускании ЛКМ",
       "zh": "鼠标左键释放时复制",
       "de": "Kopieren beim Loslassen der linken Maustaste",
       "ja": "左ボタンリリースでのコピー",
@@ -10801,7 +10801,7 @@
     ,
     "cbCTSBlockSelection": {
       "en": "Block (rectangular) selection",
-      "ru": "Блок (прямоугольник) выделения",
+      "ru": "Прямоугольный блок",
       "zh": "块状模式（矩形） 选择",
       "de": "(Rechteckige) Blockauswahl",
       "ja": "ブロック(矩形)選択",
@@ -10814,7 +10814,7 @@
     ,
     "cbCTSClickPromptPosition": {
       "en": "Change prompt (cmd, powershell) text cursor position with Left Click",
-      "ru": "Изменить положение текстового курсора подсказки (cmd, powershell) с помощью левого клика",
+      "ru": "Перемещать курсор строки ввода щелчком (cmd, PowerShell)",
       "zh": "右击改变prompt （cmd, powershell）文本光标位置",
       "de": "Ändere Schreibmarkenposition (CMD, PowerShell) mit Linksklick",
       "ja": "左クリックでプロンプト(cmd,powershell)のテキストカーソル位置を変更する",
@@ -10838,7 +10838,7 @@
     ,
     "cbCTSDetectLineEnd": {
       "en": "Detect line ends",
-      "ru": "Определять конец строки",
+      "ru": "Концы строк",
       "zh": "探测行尾",
       "de": "Erkenne Zeilenenden",
       "ja": "行末を検出",
@@ -10935,7 +10935,7 @@
     ,
     "cbCTSResetOnRelease": {
       "en": "Reset selection on Left Button release",
-      "ru": "Сброс выделения при отпускании левой кнопки",
+      "ru": "Снять выделение при отпускании ЛКМ",
       "zh": "鼠标左键释放时重置选择",
       "de": "Auswahl beim Loslassen der linken Maustaste zurücksetzen",
       "ja": "左ボタンリリースで選択をリセットする",
@@ -10973,7 +10973,7 @@
     ,
     "cbCTSTrimTrailing": {
       "en": "Trim trailing spaces",
-      "ru": "Удалять замыкающие пробелы",
+      "ru": "Убрать пробелы в конце",
       "zh": "移除首尾空格",
       "de": "Anhängende Leerzeichen abschneiden",
       "ja": "末尾のスペースを削除する",
@@ -10998,7 +10998,7 @@
     ,
     "cbCursorColor": {
       "en": "Color (inverse screen part under cursor shape)",
-      "ru": "Цвет (инвертировать часть экрана под формой курсора)",
+      "ru": "Инвертировать цвет под курсором",
       "zh": "颜色（光标形状下的逆屏幕部分）",
       "de": "Farbe (invertiere Bildschirmteil unter Schreibmarke)",
       "ja": "色(カーソル形状の反対色)",
@@ -11011,7 +11011,7 @@
     ,
     "cbCursorIgnoreSize": {
       "en": "Fixed cursor size",
-      "ru": "Фиксированный размер курсора",
+      "ru": "Заданный размер",
       "zh": "固定光标大小",
       "de": "Feste Zeigergröße",
       "ja": "固定カーソルサイズ",
@@ -11037,7 +11037,7 @@
     ,
     "cbDebugLog": {
       "en": "Internal LogFiles location",
-      "ru": "Расположение внутренних файлов журнала",
+      "ru": "Папка журналов",
       "zh": "内部日志文件的位置",
       "de": "Pfad zu internen Protokolldateien",
       "ja": "内部ログファイルの場所",
@@ -11183,7 +11183,7 @@
     ,
     "cbDnDCopy": {
       "en": "Copy by default",
-      "ru": "Копировать по умолчанию",
+      "ru": "Копировать по умолч.",
       "zh": "默认复制",
       "de": "Standardmäßig kopieren",
       "ja": "デフォルトでコピー",
@@ -11279,7 +11279,7 @@
     ,
     "cbDropEnabled": {
       "en": "Drop && Confirmation",
-      "ru": "Перемещение && Подтверждение",
+      "ru": "Принимать файлы",
       "zh": "下拉 && 确认",
       "de": "Ausklappen && Bestätigung",
       "ja": "ドロップ &",
@@ -11340,7 +11340,7 @@
     ,
     "cbEnhanceGraphics": {
       "en": "Enhance progressbars and scrollbars",
-      "ru": "Улучшать индикаторы выполнения и полосы прокрутки",
+      "ru": "Улучшать индикаторы и полосы прокрутки",
       "zh": "增强进度栏和滚动栏",
       "de": "Fortschrittsbalken und Scrollleisten verbessern",
       "ja": "進捗バーとスクロールバーを強化する",
@@ -11366,7 +11366,7 @@
     ,
     "cbExtendFonts": {
       "en": "Extend font styles",
-      "ru": "Расширение стилей шрифтов",
+      "ru": "Стили шрифтов",
       "_zh": "扩展字体",
       "de": "Erweitern",
       "ja": "フォントスタイルを拡張する",
@@ -11560,7 +11560,7 @@
     ,
     "cbFixAltOnAltTab": {
       "en": "Fix Alt on AltTab/AltF9 (to avoid execution of Far Manager macro, linked to Alt-release)",
-      "ru": "Исправить Alt на AltTab/AltF9 (чтобы избежать выполнения макроса Far Manager, связанного с Alt-отпускание)",
+      "ru": "Не запускать макрос Far при отпускании Alt (Alt+Tab / Alt+F9)",
       "zh": "修复Alt于AltTab/AltF9 （避免执行Far Manager宏, 连接到Alt-release）",
       "de": "Fixieren von Alt bei AltTab/AltF9 (um Ausführung von Far-Manager-Makros zu verhindern, die an Alt-Loslassen gebunden sind)",
       "ja": "AltTab/AltF9 で Alt を修正する (Alt-releaseにリンクされたFar Managerマクロの実行を避けるため)",
@@ -11800,7 +11800,7 @@
     ,
     "cbInactiveCursorColor": {
       "en": "Color (inverse screen part under cursor shape)",
-      "ru": "Цвет (инвертировать часть экрана под формой курсора)",
+      "ru": "Инвертировать цвет под курсором",
       "zh": "颜色（在光标下的逆屏幕部分）",
       "de": "Farbig (Farbe unter dem Cursor invertieren)",
       "ja": "色(カーソル形状の逆の画面部分)",
@@ -11813,7 +11813,7 @@
     ,
     "cbInactiveCursorIgnoreSize": {
       "en": "Fixed cursor size",
-      "ru": "Фиксированный размер курсора",
+      "ru": "Заданный размер",
       "zh": "固定光标大小",
       "de": "Feste Cursor-Größe",
       "ja": "固定カーソルサイズ",
@@ -11850,7 +11850,7 @@
     ,
     "cbInsideSyncDir": {
       "en": "Sync dir",
-      "ru": "Синхр. каталог",
+      "ru": "Синхр. папку",
       "zh": "同步目录",
       "de": "Sync-Verz.",
       "ja": "同期ディレクトリ",
@@ -12611,7 +12611,7 @@
     ,
     "cbStatusHorzSep": {
       "en": "Horizontal",
-      "ru": "Горизонтальный",
+      "ru": "Горизонтальные",
       "zh": "水平",
       "de": "Horizontal",
       "ja": "水平",
@@ -12637,7 +12637,7 @@
     ,
     "cbStatusVertPad": {
       "en": "Use vertical padding",
-      "ru": "Использовать вертикальный отступ",
+      "ru": "Отступ по вертикали",
       "zh": "使用垂直填充",
       "de": "Verwende vertikal. Auffüllen",
       "ja": "垂直パディングを使用する",
@@ -12650,7 +12650,7 @@
     ,
     "cbStatusVertSep": {
       "en": "Vertical",
-      "ru": "Вертикальный",
+      "ru": "Вертикальные",
       "zh": "垂直",
       "de": "Vertikal",
       "ja": "垂直",
@@ -12676,7 +12676,7 @@
     ,
     "cbTabLazy": {
       "en": "Lazy tab switch",
-      "ru": "Lazy Переключатель вкладки",
+      "ru": "Отложить выбор",
       "zh": "懒人标签开关",
       "de": "Verzögerter Wechsel",
       "ja": "Lazyタブスイッチ",
@@ -12807,7 +12807,7 @@
     ,
     "cbThumbPreviewBox": {
       "en": "Preview frame",
-      "ru": "Предварительный просмотр",
+      "ru": "Рамка превью",
       "zh": "预览框",
       "de": "Dialogvorschau",
       "ja": "プレビューフレーム",
@@ -12937,7 +12937,7 @@
     ,
     "cbUpdateCheckHourly": {
       "en": "Hourly",
-      "ru": "Каждый час",
+      "ru": "Ежечасно",
       "zh": "每小时",
       "de": "Stündlich",
       "ja": "毎時",
@@ -13027,7 +13027,7 @@
     ,
     "cbUseClink": {
       "en": "Use Clink in prompt",
-      "ru": "Использовать Clink в подсказке",
+      "ru": "Использовать Clink",
       "zh": "命令行提示符里使用Clink",
       "de": "Clink in CMD laden",
       "ja": "プロンプトでClinkを使う",
@@ -13131,7 +13131,7 @@
     ,
     "cbVisible": {
       "en": "Show real console",
-      "ru": "Показать реальную консоль",
+      "ru": "Показать консоль",
       "zh": "显示真实控制台",
       "de": "Zeige echte Konsole",
       "ja": "実際のコンソールを表示する",
@@ -15236,7 +15236,7 @@
     ,
     "rbThumbBackColorIdx": {
       "en": "Color index",
-      "ru": "Цветовой индекс",
+      "ru": "Индекс",
       "zh": "颜色索引",
       "de": "Farbindex",
       "ja": "カラーインデックス",
@@ -15313,7 +15313,7 @@
     ,
     "rbThumbPreviewBoxColorIdx": {
       "en": "Color index",
-      "ru": "Цветовой индекс",
+      "ru": "Индекс",
       "zh": "颜色索引",
       "de": "Farbindex",
       "ja": "カラーインデックス",
@@ -15339,7 +15339,7 @@
     ,
     "rbThumbSelectionBoxColorIdx": {
       "en": "Color index",
-      "ru": "Цветовой индекс",
+      "ru": "Индекс",
       "zh": "颜色索引",
       "de": "Farbindex",
       "ja": "カラーインデックス",
@@ -15378,7 +15378,7 @@
     ,
     "rbUpdatePreview": {
       "en": "Preview",
-      "ru": "Предпросмотр",
+      "ru": "Предварительный",
       "zh": "预览",
       "de": "Vorschau",
       "ja": "Preview",
@@ -15391,7 +15391,7 @@
     ,
     "rbUpdateStableOnly": {
       "en": "Stable",
-      "ru": "Стабильная",
+      "ru": "Стабильный",
       "zh": "稳定",
       "de": "Stabil",
       "ja": "Stable",
@@ -15469,7 +15469,7 @@
     ,
     "rCursorH": {
       "en": "Horizontal (as console)",
-      "ru": "Горизонтальный (как консоль)",
+      "ru": "Горизонтальный",
       "zh": "水平（类似控制台）",
       "de": "Horizontal (wie Konsole)",
       "ja": "水平 (コンソールとして)",
@@ -15495,7 +15495,7 @@
     ,
     "rCursorV": {
       "en": "Vertical (as GUI)",
-      "ru": "Вертикальный (как GUI)",
+      "ru": "Вертикальный",
       "zh": "垂直（类似 GUI）",
       "de": "Vertikal (wie GUI)",
       "ja": "垂直 (GUIとして)",
@@ -15547,7 +15547,7 @@
     ,
     "rInactiveCursorH": {
       "en": "Horizontal (as console)",
-      "ru": "Горизонтальный (как консоль)",
+      "ru": "Горизонтальный",
       "zh": "水平（类似控制台）",
       "de": "Horizontal (wie Konsole)",
       "ja": "水平 (コンソールとして)",
@@ -15573,7 +15573,7 @@
     ,
     "rInactiveCursorV": {
       "en": "Vertical (as GUI)",
-      "ru": "Вертикальный (как GUI)",
+      "ru": "Вертикальный",
       "zh": "垂直（类似 GUI）",
       "de": "Vertikal (wie GUI)",
       "ja": "垂直 (GUIとして)",
@@ -15613,7 +15613,7 @@
     ,
     "rNormal": {
       "en": "Normal",
-      "ru": "Нормальный",
+      "ru": "Обычное",
       "zh": "正常",
       "de": "Normal",
       "ja": "通常",
@@ -17080,7 +17080,7 @@
     ,
     "stRConStates": {
       "en": "States:",
-      "ru": "Состояния:",
+      "ru": "Режимы:",
       "zh": "状态：",
       "de": "Zustände:",
       "ja": "州:",
@@ -17279,7 +17279,7 @@
     ,
     "stStatusColorBack": {
       "en": "Back:",
-      "ru": "Назад:",
+      "ru": "Фон:",
       "zh": "背景：",
       "de": "Hintergr.:",
       "ja": "バック:",
@@ -17473,7 +17473,7 @@
     ,
     "stTabFlashCounter": {
       "en": "Invisible tab activity flash count:",
-      "ru": "Количество вспышок активности для невидимой вкладки:",
+      "ru": "Миганий скрытой вкладки:",
       "zh": "隐形标签页的活动的闪光计数：",
       "de": "Aufblinken von inaktiven Reitern bei Aktivität:",
       "ja": "見えないタブアクティビティのフラッシュカウント:",
@@ -17895,7 +17895,7 @@
     ,
     "stUpdateVerLocation": {
       "en": "ConEmu latest version location info",
-      "ru": "URL информации о последних версия",
+      "ru": "Адрес сведений о версиях",
       "zh": "ConEmu 版本更新来源",
       "de": "Adresse zu Versionsinformationen",
       "ja": "ConEmu最新バージョンの位置情報",
@@ -17921,7 +17921,7 @@
     ,
     "stVConFontFix": {
       "en": "Fix:",
-      "ru": "Исправленя:",
+      "ru": "Рамки:",
       "zh": "修复：",
       "de": "Fest:",
       "ja": "修正:",

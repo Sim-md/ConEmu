@@ -56,14 +56,26 @@ void PaintButton(HWND window, HDC dc)
 	const bool radio = type == BS_RADIOBUTTON || type == BS_AUTORADIOBUTTON;
 	const bool group = type == BS_GROUPBOX;
 	const bool push = !group && (!(check || radio) || (style & BS_PUSHLIKE));
-	FillRect(dc, &rc, Brush(dc, push ? (pressed ? RGB(80,80,80) : hot ? Hover : Control) : Background));
 	SelectObject(dc, reinterpret_cast<HFONT>(SendMessage(window, WM_GETFONT, 0, 0)));
 	SetTextColor(dc, enabled ? Text : Hint);
 	SetBkMode(dc, TRANSPARENT);
 	wchar_t text[1024] = {}; GetWindowText(window, text, countof(text));
 	TEXTMETRIC metrics = {}; GetTextMetrics(dc, &metrics);
 	const int unit = std::max(13L, metrics.tmHeight);
-	HPEN pen = CreatePen(PS_SOLID, 1, (hot || GetFocus() == window || type == BS_DEFPUSHBUTTON) ? Accent : Border);
+	if (check && !push && !(style & (BS_LEFTTEXT | BS_MULTILINE)))
+	{
+		// A checkbox used as a group caption must only cover the frame under its text.
+		RECT textBounds{};
+		DrawText(dc, text, -1, &textBounds, DT_CALCRECT | DT_SINGLELINE);
+		rc.right = std::min(rc.right, rc.left + textBounds.right + unit + 10);
+	}
+	// Controls inside a group box are siblings and may have already painted.
+	// Let the dialog paint the background and leave the group's interior alone.
+	if (!group)
+		FillRect(dc, &rc, Brush(dc, push ? (pressed ? RGB(80,80,80) : hot ? Hover : Control) : Background));
+	// A group frame is decorative. Scrolling can repaint it under a stationary pointer.
+	const bool accentBorder = !group && (hot || GetFocus() == window || type == BS_DEFPUSHBUTTON);
+	HPEN pen = CreatePen(PS_SOLID, 1, accentBorder ? Accent : Border);
 	HGDIOBJ oldPen = SelectObject(dc, pen);
 	HGDIOBJ oldBrush = SelectObject(dc, GetStockObject(NULL_BRUSH));
 	RECT label = rc;
@@ -71,8 +83,13 @@ void PaintButton(HWND window, HDC dc)
 	{
 		Rectangle(dc, 0, metrics.tmHeight/2, rc.right, rc.bottom);
 		label.left += unit / 2; label.bottom = label.top + metrics.tmHeight;
-		RECT bounds = label; DrawText(dc, text, -1, &bounds, DT_CALCRECT | DT_SINGLELINE);
-		bounds.right += 4; FillRect(dc, &bounds, Brush(dc, Background));
+		if (text[0])
+		{
+			RECT bounds = label;
+			DrawText(dc, text, -1, &bounds, DT_CALCRECT | DT_SINGLELINE);
+			bounds.right = std::min(bounds.right + 4, rc.right);
+			FillRect(dc, &bounds, Brush(dc, Background));
+		}
 	}
 	else if (push)
 	{
