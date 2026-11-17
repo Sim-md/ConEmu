@@ -218,18 +218,18 @@ jobs:
         with:
           name: packaged-release
           path: dist
-      - name: Publish prerelease
+      - name: Publish latest release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.package.outputs.tag }}
         run: |
           tag="$TAG"
           version=$(sed -n 's/^version=//p' dist/version.ini | head -n 1)
-          gh release create "$tag" --target "$GITHUB_SHA" --draft --prerelease --latest=false \
+          gh release create "$tag" --target "$GITHUB_SHA" --draft --latest=false \
             --title "ConEmu $version (${GITHUB_SHA:0:7})" \
             --notes "ARM64, x86 and x64 builds from $GITHUB_SHA. All jobs passed in $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID. SHA-256 sums are in SHA256SUMS.txt."
           gh release upload "$tag" dist/*.zip dist/SHA256SUMS.txt dist/version.ini
-          gh release edit "$tag" --draft=false --prerelease --latest=false
+          gh release edit "$tag" --draft=false --prerelease=false --latest
       - name: Publish version.ini for installed copies
         env:
           GH_TOKEN: ${{ github.token }}
