@@ -3134,13 +3134,11 @@ void CSetDlgButtons::OnBtn_UseClink(HWND hDlg, WORD CB, BYTE uCheck)
 
 	if (gpSet->mb_UseClink && !gpSet->isUseClink())
 	{
+		gpSet->mb_UseClink = false;
 		checkDlgButton(hDlg, cbUseClink, BST_UNCHECKED);
-		wchar_t szErrInfo[MAX_PATH+200];
-		swprintf_c(szErrInfo,
-			L"Clink was not found in '%s\\clink'. Download and unpack clink files\nhttps://chrisant996.github.io/clink/\n\n"
-			L"Note that you don't need to check 'Use clink'\nif you already have set up clink globally.",
-			gpConEmu->ms_ConEmuBaseDir);
-		MsgBox(szErrInfo, MB_ICONSTOP|MB_SYSTEMMODAL, nullptr, ghOpWnd);
+		const CEStr message(CLngRc::getRsrc(lng_ClinkNotFound), L"\n\n",
+			gpConEmu->ms_ConEmuBaseDir, L"\\clink\nhttps://chrisant996.github.io/clink/");
+		MsgBox(message, MB_ICONSTOP|MB_SYSTEMMODAL, nullptr, ghOpWnd);
 	}
 	gpConEmu->OnGlobalSettingsChanged();
 

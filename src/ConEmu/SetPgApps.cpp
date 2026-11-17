@@ -822,6 +822,17 @@ void CSetPgApps::DoEnableControls(WORD nGroupCtrlId)
 		CSetDlgLists::EnableDlgItems(hDlgCtrl, DistinctControls[i].nCtrls, countof(DistinctControls[i].nCtrls), bEnabled);
 	}
 
+	if (!nGroupCtrlId)
+	{
+		for (HWND control = GetWindow(mh_Child, GW_CHILD); control; control = GetWindow(control, GW_HWNDNEXT))
+		{
+			if (GetDlgCtrlID(control) != IDC_STATIC) continue;
+			wchar_t className[16] = {};
+			GetClassName(control, className, countof(className));
+			if (lstrcmpi(className, L"Button") == 0 && (GetWindowLong(control, GWL_STYLE) & BS_TYPEMASK) == BS_GROUPBOX)
+				EnableWindow(control, bAllowed);
+		}
+	}
 	InvalidateCtrl(mh_Child, FALSE);
 }
 

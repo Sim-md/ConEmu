@@ -240,6 +240,7 @@ enum LngResources
 	lng_HotkeyColumnType          = 209,
 	lng_HotkeyColumnKey           = 210,
 	lng_HotkeyColumnDescription   = 211,
+	lng_ClinkNotFound             = 212,
 	// last auto-gen identifier
 	lng_NextId
 };

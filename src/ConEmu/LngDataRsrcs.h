@@ -239,5 +239,8 @@ static LngPredefined gsDataRsrcs[] = {
 	{ lng_HotkeyColumnType,          L"Type" },
 	{ lng_HotkeyColumnKey,           L"Hotkey" },
 	{ lng_HotkeyColumnDescription,   L"Description" },
+	{ lng_ClinkNotFound,
+		L"Clink was not found in the folder below. Download and unpack Clink there.\n"
+		L"If Clink is already configured globally, leave this option unchecked." },
 	{ /* empty trailing item for patch convenience */ }
 };

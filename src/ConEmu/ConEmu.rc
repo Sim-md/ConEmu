@@ -409,7 +409,7 @@ BEGIN
     RTEXT           "Min size (pix):",stCursorMinSize,193,49,72,8
     EDITTEXT        tCursorMinSize,271,47,40,12,ES_AUTOHSCROLL
     GROUPBOX        "",gbCursorInactive,4,81,375,83
-    CONTROL         "Inactive console Text Cursor",cbInactiveCursor,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,81,120,8
+    CONTROL         "Inactive console Text Cursor",cbInactiveCursor,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,81,235,8
     CONTROL         "Horizontal (as console)",rInactiveCursorH,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,95,102,8
     CONTROL         "Vertical (as GUI)",rInactiveCursorV,"Button",BS_AUTORADIOBUTTON,116,95,92,8
     CONTROL         "Block",rInactiveCursorB,"Button",BS_AUTORADIOBUTTON,209,95,47,8
@@ -471,9 +471,9 @@ BEGIN
     PUSHBUTTON      "Apply",cbApplyDefTerm,313,64,61,12
     CONTROL         "Don't use ConEmuHk.dll in started console",cbDefaultTerminalNoInjects,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,86,364,8
-    CONTROL         "Automatic",rbDefaultTerminalConfAuto,"Button",BS_AUTORADIOBUTTON,17,145,57,8
-    CONTROL         "Always",rbDefaultTerminalConfAlways,"Button",BS_AUTORADIOBUTTON,80,145,57,8
-    CONTROL         "Never",rbDefaultTerminalConfNever,"Button",BS_AUTORADIOBUTTON,141,145,62,8
+    CONTROL         "Automatic",rbDefaultTerminalConfAuto,"Button",BS_AUTORADIOBUTTON,17,145,73,8
+    CONTROL         "Always",rbDefaultTerminalConfAlways,"Button",BS_AUTORADIOBUTTON,96,145,62,8
+    CONTROL         "Never",rbDefaultTerminalConfNever,"Button",BS_AUTORADIOBUTTON,164,145,65,8
     CONTROL         "Register on OS startup",cbDefaultTerminalStartup,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,28,118,8
     CONTROL         "Leave in TSA",cbDefaultTerminalTSA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,131,28,95,8
     CONTROL         "Aggressive mode",cbDefTermAgressive,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,230,28,110,8
@@ -613,23 +613,23 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,116,309,8
 END
 
-IDD_SETTINGS DIALOGEX 0, 0, 507, 297
+IDD_SETTINGS DIALOGEX 0, 0, 519, 297
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "Settings..."
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    CONTROL         "List1",tvSetupCategories,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | WS_BORDER | WS_HSCROLL | WS_TABSTOP,4,19,112,254
-    EDITTEXT        tOptionSearch,4,3,112,13,ES_AUTOHSCROLL | ES_WANTRETURN
-    LTEXT           " ",tSetupPagePlace,121,19,381,243,WS_BORDER
-    DEFPUSHBUTTON   "Save settings",bSaveSettings,388,278,114,14
-    PUSHBUTTON      "Reset...",bResetSettings,181,278,60,14
-    PUSHBUTTON      "Reload...",bReloadSettings,247,278,60,14
-    PUSHBUTTON      "Import...",bImportSettings,313,278,60,14
-    LTEXT           "Storage:",stStorage,135,5,47,8
-    EDITTEXT        tStorage,186,3,251,13,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "Export...",cbExportConfig,442,2,60,14
-    LTEXT           "https://conemu.github.io/en/Settings.html",stSetPgWikiLink,125,264,373,8,SS_NOTIFY
+    CONTROL         "List1",tvSetupCategories,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | WS_BORDER | WS_HSCROLL | WS_TABSTOP,4,19,124,254
+    EDITTEXT        tOptionSearch,4,3,124,13,ES_AUTOHSCROLL | ES_WANTRETURN
+    LTEXT           " ",tSetupPagePlace,133,19,381,243,WS_BORDER
+    DEFPUSHBUTTON   "Save settings",bSaveSettings,400,278,114,14
+    PUSHBUTTON      "Reset...",bResetSettings,193,278,60,14
+    PUSHBUTTON      "Reload...",bReloadSettings,259,278,60,14
+    PUSHBUTTON      "Import...",bImportSettings,325,278,60,14
+    LTEXT           "Storage:",stStorage,147,5,47,8
+    EDITTEXT        tStorage,198,3,251,13,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Export...",cbExportConfig,454,2,60,14
+    LTEXT           "https://conemu.github.io/en/Settings.html",stSetPgWikiLink,137,264,373,8,SS_NOTIFY
 END
 
 IDD_SPG_INFO DIALOGEX 0, 0, 381, 249
@@ -1292,31 +1292,31 @@ BEGIN
     CONTROL         "Preview",rbUpdatePreview,"Button",BS_AUTORADIOBUTTON,169,29,96,8
     CONTROL         "Latest",rbUpdateLatestAvailable,"Button",BS_AUTORADIOBUTTON,270,29,103,8
     CONTROL         "External downloader",cbUpdateInetTool,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,45,87,10
-    EDITTEXT        tUpdateInetTool,103,43,194,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",cbUpdateInetToolPath,302,43,15,13
+    EDITTEXT        tUpdateInetTool,103,43,251,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",cbUpdateInetToolPath,358,43,15,13
     CONTROL         "Proxy",cbUpdateUseProxy,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,39,8
-    RTEXT           "Server:port",stUpdateProxy,55,65,42,8,WS_DISABLED
-    EDITTEXT        tUpdateProxy,103,63,62,13,ES_AUTOHSCROLL | WS_DISABLED
-    RTEXT           "User",stUpdateProxyUser,167,65,27,8,WS_DISABLED
-    EDITTEXT        tUpdateProxyUser,197,63,39,13,ES_AUTOHSCROLL | WS_DISABLED
-    RTEXT           "Password",stUpdateProxyPassword,241,65,34,8,WS_DISABLED
-    EDITTEXT        tUpdateProxyPassword,278,63,39,13,ES_PASSWORD | ES_AUTOHSCROLL | WS_DISABLED
+    RTEXT           "Server:port",stUpdateProxy,53,65,53,8,WS_DISABLED
+    EDITTEXT        tUpdateProxy,110,63,82,13,ES_AUTOHSCROLL | WS_DISABLED
+    RTEXT           "User",stUpdateProxyUser,196,65,37,8,WS_DISABLED
+    EDITTEXT        tUpdateProxyUser,237,63,44,13,ES_AUTOHSCROLL | WS_DISABLED
+    RTEXT           "Password",stUpdateProxyPassword,285,65,39,8,WS_DISABLED
+    EDITTEXT        tUpdateProxyPassword,328,63,45,13,ES_PASSWORD | ES_AUTOHSCROLL | WS_DISABLED
     CONTROL         "Leave downloaded packages",cbUpdateLeavePackages,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,85,126,10
-    EDITTEXT        tUpdateDownloadPath,138,84,159,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",cbUpdateDownloadPath,302,84,15,13
-    LTEXT           "Update command (%1 - package, %2 - ConEmu.exe folder, %3 - x86/x64, %4 - PID)",stUpdateCommand,12,102,310,8
+    EDITTEXT        tUpdateDownloadPath,138,84,216,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",cbUpdateDownloadPath,358,84,15,13
+    LTEXT           "Update command (%1 - package, %2 - ConEmu.exe folder, %3 - x86/x64, %4 - PID)",stUpdateCommand,12,102,361,8
     CONTROL         "Installer (ConEmuSetup.exe /p:%s)",rbUpdateUseExe,
                     "Button",BS_AUTORADIOBUTTON | WS_DISABLED,21,112,151,10
-    EDITTEXT        tUpdateExeCmdLine,21,124,295,14,ES_AUTOHSCROLL
+    EDITTEXT        tUpdateExeCmdLine,21,124,352,14,ES_AUTOHSCROLL
     CONTROL         "7-Zip archive (ConEmu.7z), WinRar or 7-Zip required",rbUpdateUseArc,
                     "Button",BS_AUTORADIOBUTTON | WS_DISABLED,21,141,226,10
-    EDITTEXT        tUpdateArcCmdLine,21,153,276,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",cbUpdateArcCmdLine,301,153,15,13
-    LTEXT           "Post-update command, don't forget ‘call’ for batches",stUpdatePostCommand,12,173,310,8
-    EDITTEXT        tUpdatePostUpdateCmd,21,185,295,13,ES_AUTOHSCROLL
-    LTEXT           "ConEmu latest version location info",stUpdateVerLocation,12,201,305,8
-    EDITTEXT        tUpdateVerLocation,21,212,190,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "Apply && Check",cbUpdateCheck,219,211,98,15
+    EDITTEXT        tUpdateArcCmdLine,21,153,333,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",cbUpdateArcCmdLine,358,153,15,13
+    LTEXT           "Post-update command, don't forget ‘call’ for batches",stUpdatePostCommand,12,173,361,8
+    EDITTEXT        tUpdatePostUpdateCmd,21,185,352,13,ES_AUTOHSCROLL
+    LTEXT           "ConEmu latest version location info",stUpdateVerLocation,12,201,361,8
+    EDITTEXT        tUpdateVerLocation,21,212,244,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "Apply && Check",cbUpdateCheck,271,211,102,15
 END
 
 IDD_FAST_CONFIG DIALOGEX 0, 0, 347, 305
@@ -1403,12 +1403,12 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     GROUPBOX        "Application distinct settings",gbAppDistinct,4,1,375,240
-    LISTBOX         lbAppDistinct,9,12,307,44,LBS_USETABSTOPS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
-    PUSHBUTTON      "+",cbAppDistinctAdd,321,12,25,14
-    PUSHBUTTON      "-",cbAppDistinctDel,347,12,25,14
-    PUSHBUTTON      "Up",cbAppDistinctUp,321,27,25,14
-    PUSHBUTTON      "Down",cbAppDistinctDown,347,27,25,14
-    PUSHBUTTON      "Reload...",cbAppDistinctReload,321,42,51,14
+    LISTBOX         lbAppDistinct,9,12,300,44,LBS_USETABSTOPS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    PUSHBUTTON      "+",cbAppDistinctAdd,314,12,28,14
+    PUSHBUTTON      "-",cbAppDistinctDel,344,12,28,14
+    PUSHBUTTON      "Up",cbAppDistinctUp,314,27,28,14
+    PUSHBUTTON      "Down",cbAppDistinctDown,344,27,28,14
+    PUSHBUTTON      "Reload...",cbAppDistinctReload,314,42,58,14
     CONTROL         "Elevated",rbAppDistinctElevatedOn,"Button",BS_AUTORADIOBUTTON,292,61,85,8
     CONTROL         "Non elevated",rbAppDistinctElevatedOff,"Button",BS_AUTORADIOBUTTON,292,73,85,8
     CONTROL         "Doesn't matter",rbAppDistinctElevatedIgnore,"Button",BS_AUTORADIOBUTTON,292,85,85,8
@@ -1468,7 +1468,7 @@ BEGIN
                     "Button",BS_AUTO3STATE | WS_TABSTOP,13,374,330,8
     CONTROL         "Start selection with Shift+Arrow (Text = Left/Right/Home/End, Block = Up/Down)",cbCTSShiftArrowStartSel,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,268,330,8
-    CONTROL         "Inactive console Text Cursor",cbInactiveCursor,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,94,120,8
+    CONTROL         "Inactive console Text Cursor",cbInactiveCursor,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,94,235,8
     CONTROL         "Horizontal (as console)",rInactiveCursorH,"Button",BS_AUTORADIOBUTTON | WS_GROUP,7,108,108,8
     CONTROL         "Vertical (as GUI)",rInactiveCursorV,"Button",BS_AUTORADIOBUTTON,116,108,82,8
     CONTROL         "Block",rInactiveCursorB,"Button",BS_AUTORADIOBUTTON,200,108,67,8

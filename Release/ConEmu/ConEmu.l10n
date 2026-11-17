@@ -1789,7 +1789,7 @@
     ,
     "cbProcessAnsi": {
       "en": "Enable processing of ANSI escape sequences, ‘Inject ConEmuHk’ must be checked if you want to work with second level processes (e.g. cmd.exe -> app.exe)",
-      "ru": "Включить обработку последовательностей ANSI, ‘Inject ConEmuHk’ должна быть включена, если вы хотите работать с процессами второго уровня (например. cmd.exe -> app.exe)",
+      "ru": "Обрабатывать последовательности ANSI. Для дочерних процессов (например, cmd.exe → app.exe) нужна опция «Внедрить ConEmuHk».",
       "zh": "启用 ANSI 转义序列的处理，如果你想调用第二层次的进程（比如：cmd.exe -> app.exe），‘注入 ConEmuHk’ 必须被选中",
       "de": "Verarbeitung von ANSI-Escape-Sequenzen aktivieren, 'ConEmuHk einschleusen' muss ausgewählt sein wenn mit Prozessen zweiter Ebenen gearbeitet werden soll (z.B. cmd.exe -> app.exe)",
       "ja": "ANSIエスケープシーケンスの処理を有効にする,2番目のレベルのプロセス(cmd.exe  -> app.exeなど)を使用する場合は, 'Inject ConEmuHk'をオンにする必要があります.",
@@ -1801,7 +1801,7 @@
     ,
     "cbProcessCmdStart": {
       "en": "Hook 'start' command in your cmd's prompt and batches started in ConEmu tabs to run console applications in new ConEmu tabs",
-      "ru": "Перхватывать команду 'start' в командной строке и запустите пакетно на вкладках ConEmu для запуска консольных приложений на новых вкладках ConEmu",
+      "ru": "Перехватывать команду 'start' в cmd и BAT-файлах, запущенных во вкладках ConEmu, чтобы открывать консольные приложения в новых вкладках.",
       "zh": "Hook 你 cmd prompt 里的 'start' 命令，以及在 ConEmu 标签页里开始的批处理中的 'start' 命令，然后在新的 ConEmu 标签页运行控制台程序",
       "de": "Den 'start'-Befehl in, in ConEmu-Reitern gestarteten, CMD-Prompts und Batch-Skripten abfangen, um Konsolenanwendungen in neuen ConEmu-Reitern zu starten",
       "ja": "cmdプロンプトで'start'コマンドをフックし,新しいConEmuタブでコンソールアプリケーションを実行するためにConEmuタブでバッチを開始しました",
@@ -1814,8 +1814,8 @@
     "cbProcessCtrlZ": {
       "en": [ "Treat Ctrl-Z as ‘EndOfStream’. On new line press Ctrl-Z and Enter.\r\n"
             , "Refer to the gh#465 for details (Go input streams)." ],
-      "ru": [ "Считайте Ctrl-Z как ‘EndOfStream’. В новой строке нажмите Ctrl-Z и Enter.\r\n"
-            , "Обратитесь к gh#465 для деталей (Go входные потоки)." ],
+      "ru": [ "Считать Ctrl+Z концом потока ввода. На новой строке нажмите Ctrl+Z, затем Enter.\r\n"
+            , "Подробности см. в задаче ConEmu #465 на GitHub (потоки ввода в Go)." ],
       "zh": [ "把 Ctrl-Z 作为 ‘EndOfStream’。在新的一行按下 Ctrl-Z 和 Enter。\r\n"
             , "细节请参考 gh#465（Go input streams）。" ],
       "de": [ "Behandelt Strg-Z wie 'EndOfStream'. In einer neuen Zeile dafür Strg-Z und Enter drücken.\r\n"
@@ -2258,7 +2258,7 @@
       "en": [ "Suppress annoying bells produced by echoing char(7), Beep and MessageBeep functions.\r\n"
             , "Inject ConEmuHk is required." ],
       "ru": [ "Подавить надоедливые звуки, вызванные повторением функций char(7), Beep и MessageBeep.\r\n"
-            , "Требуется Inject ConEmuHk." ],
+            , "Требуется опция «Внедрить ConEmuHk»." ],
       "zh": [ "抑制回显字符（7）、Beep 和 MessageBeep 函数时产生的烦人响声。\r\n"
             , "需要注入 ConEmuHk" ],
       "ja": [ "char(7),Beep,およびMessageBeep関数をエコーすることによって生成される厄介な鐘を抑制します.\r\n"
@@ -2550,7 +2550,7 @@
     "cbUseClink": {
       "en": [ "Use clink to extend command prompt (cmd.exe)\r\n"
             , "https://chrisant996.github.io/clink/" ],
-      "ru": [ "Используйте clink для расширения командной строки (cmd.exe)\r\n"
+      "ru": [ "Загружать Clink из папки ConEmu\\clink для cmd.exe. Если Clink уже запускается при старте cmd, оставьте галочку снятой.\r\n"
             , "https://chrisant996.github.io/clink/" ],
       "zh": [ "使用 Clink 扩展 command prompt（cmd.exe）\r\n"
             , "https://chrisant996.github.io/clink/" ],
@@ -3020,7 +3020,7 @@
       "en": [ "Log in console progress creations.\r\n"
             , "‘Inject ConEmuHk’ is required" ],
       "ru": [ "Войти в консоль.\r\n"
-            , "Требуется ‘Inject ConEmuHk’" ],
+            , "Требуется опция «Внедрить ConEmuHk»." ],
       "zh": [ "将进程创建的状态记录到控制台中。\n"
             , "要求 “注入 ConEmuHk” 已启用" ],
       "de": [ "Protokolliert in Konsole Prozesserzeugungen.\r\n"
@@ -3043,7 +3043,7 @@
       "en": [ "Log shell calls (progress creations, library loadings, etc.)\r\n"
             , "‘Inject ConEmuHk’ is required" ],
       "ru": [ "Записывать вызовы оболочки (создание прогресса, загрузка библиотеки и т.д.) \r\n"
-            , "Требуется ‘Inject ConEmuHk’" ],
+            , "Требуется опция «Внедрить ConEmuHk»." ],
       "zh": "记录 shell 调用（创建过程、加载库过程、等等）的日志，需要 ‘注入ConEmuHk’",
       "de": [ "Protokolliert Shell-Aufrufe (Progresserzeugungen, Bibliotheksaufrufe, usw.)\r\n"
             , "'Einschleusen von ConEmuHk' ist erforderlich" ],
@@ -3461,7 +3461,7 @@
     ,
     "tCmdGroupKey": {
       "en": "Choose hotkey for creating this task (not global, it works in ConEmu only)",
-      "ru": "Выберать горячую клавишу для создания этой задачи (не глобальная, работает только в ConEmu)",
+      "ru": "Выбрать хоткей для запуска этой задачи. Он действует только в ConEmu.",
       "zh": "选择创建此任务的热键（非全局，仅在 ConEmu 中有效）",
       "de": "Schnelltaste zum Erstellen diese Aufgabe auswählen (nicht global, funktioniert nur in ConEmu)",
       "ja": "このタスクを作成するためのホットキーを選択します(グローバルではなく,ConEmuでのみ動作します)",
@@ -7381,6 +7381,11 @@
       "ko_KR": "콘솔",
       "id": 204 }
     ,
+    "lng_ClinkNotFound": {
+      "en": "Clink was not found in the folder below. Download and unpack Clink there.\nIf Clink is already configured globally, leave this option unchecked.",
+      "ru": "В указанной ниже папке Clink не найден. Скачайте и распакуйте Clink в эту папку.\nЕсли Clink уже настроен через автозапуск cmd, оставьте эту галочку снятой.",
+      "id": 212 }
+    ,
     "lng_ConfirmCloseBtnGroup": {
       "en": "Close group of",
       "ru": "Закрыть группу из",
@@ -7725,7 +7730,7 @@
     ,
     "lng_HotkeyDuplicated": {
       "en": "Hotkey <%s> is not unique",
-      "ru": "Горячая клавиша <%s> не уникальна",
+      "ru": "Хоткей <%s> уже используется",
       "zh": "热键 <%s> 已被其他程序绑定（而不是唯一）",
       "de": "Das Tastenkürzel <%s> wird bereits verwendet",
       "ja": "ホットキー<%s>は一意ではありません",
@@ -7738,7 +7743,7 @@
     ,
     "lng_HotkeysAll": {
       "en": "All hotkeys",
-      "ru": "Все горячие клавиши",
+      "ru": "Все хоткеи",
       "zh": "所有热键（&A）",
       "de": "Alle Tastenkürzel",
       "ja": "すべてのホットキー",
@@ -7809,7 +7814,7 @@
       "id": 209 },
     "lng_HotkeyColumnKey": {
       "en": "Hotkey",
-      "ru": "Горячая клавиша",
+      "ru": "Хоткей",
       "zh": "快捷键",
       "de": "Tastenkürzel",
       "ja": "ホットキー",
@@ -8403,7 +8408,7 @@
     ,
     "lng_MenuHotkeys": {
       "en": "Hot&keys",
-      "ru": "Горячие клавиши",
+      "ru": "Хоткеи",
       "zh": "热键",
       "de": "Tasten&kürzel",
       "pl": "Klawisze skrótu",
@@ -11775,7 +11780,7 @@
     ,
     "cbInactiveCursor": {
       "en": "Inactive console Text Cursor",
-      "ru": "Неактивная консоль Курсор",
+      "ru": "Неактивная консоль: текстовый курсор",
       "zh": "不活动的控制台文本光标",
       "de": "Cursor in inaktiven Konsolen",
       "ja": "非アクティブなコンソールのテキストカーソル",
@@ -11952,7 +11957,7 @@
     ,
     "cbMapShiftEscToEsc": {
       "en": "Map Shift+Esc to Esc",
-      "ru": "Карта Shift+Esc для Esc",
+      "ru": "Переназначить Shift+Esc как Esc",
       "zh": "关联Shift+Esc到Esc",
       "de": "Umslt+Esc auf Esc abbilden",
       "ja": "Shift+Esc を Escにマップする",
@@ -11978,7 +11983,7 @@
     ,
     "cbMinimizeOnLoseFocus": {
       "en": "Minimize on focus lose (not in Quake style)",
-      "ru": "Сворачивать при потере фокуса (not in Quake style)",
+      "ru": "Сворачивать при потере фокуса (кроме режима Quake)",
       "zh": "失去焦点时最小化（不使用Quake方式）",
       "de": "Wenn Fenster den Fokus verliert (nicht im Quake-Modus)",
       "ja": "フォーカスを最小限に抑える(Quakeスタイルではない)",
@@ -12225,7 +12230,7 @@
     ,
     "cbQuakeStyle": {
       "en": "Quake style slide down",
-      "ru": "Стиль Quake опускается вниз",
+      "ru": "Режим выпадающей консоли (Quake)",
       "zh": "Quake式向下滑动",
       "de": "Einblenden im Quake-Modus",
       "ja": "Quakeスタイル スライドダウン",
@@ -13027,7 +13032,7 @@
     ,
     "cbUseClink": {
       "en": "Use Clink in prompt",
-      "ru": "Использовать Clink",
+      "ru": "Локальный Clink",
       "zh": "命令行提示符里使用Clink",
       "de": "Clink in CMD laden",
       "ja": "プロンプトでClinkを使う",
@@ -13471,7 +13476,7 @@
     ,
     "gbCursorActive": {
       "en": "Active console Text Cursor",
-      "ru": "Активная консоль Курсор",
+      "ru": "Активная консоль: текстовый курсор",
       "zh": "活动控制台的文本光标",
       "de": "Cursor der aktiven Konsole",
       "ja": "アクティブなコンソールのテキストカーソル",
@@ -13724,7 +13729,7 @@
     ,
     "gbHotkeys": {
       "en": "Hotkeys, modifiers, macros",
-      "ru": "Горячие клавиши, модификаторы, макросы",
+      "ru": "Хоткеи, модификаторы, макросы",
       "zh": "热键，修改器，宏",
       "de": "Tastenkürzel, Modi, Makros",
       "ja": "ホットキー, モデファイヤ, マクロ",
@@ -15975,7 +15980,7 @@
     ,
     "stCmdGroupKey": {
       "en": "&Hotkey:",
-      "ru": "Горячая клавиша:",
+      "ru": "Хоткей:",
       "zh": "热键（&H）：",
       "de": "&Kürzel",
       "ja": "ホットキー:(&H)",
@@ -16052,7 +16057,7 @@
     ,
     "stColorPopupText": {
       "en": "Popup:",
-      "ru": "Всплывающее уведомление:",
+      "ru": "Вспл. ок.:",
       "zh": "弹出：",
       "de": "PopUp:",
       "ja": "ポップアップ:",
@@ -16675,14 +16680,14 @@
     ,
     "stHotKeySelect": {
       "en": "Choose hotkey:",
-      "ru": "Горячая клавиша:",
+      "ru": "Хоткей:",
       "zh": "选择热键：",
       "de": "Tastenkürzel auswählen:",
       "ja": "ホットキーを選択:",
       "es": "Elegir combinación:",
       "pl": "Wybierz skrót:",
       "it_IT": "Scegli tasto:",
-      "fr": "Choisissez une touche de raccourci :",
+      "fr": "Choisir un raccourci :",
       "ko": "단축키 선택:",
       "ko_KR": "단축키 선택:",
       "pt_BR": "Escolher atalho:",
