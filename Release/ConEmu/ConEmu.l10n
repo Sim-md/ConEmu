@@ -670,7 +670,7 @@
             , "Implement ‘usual’ hotkeys Ctrl+X, Shift+Del, BS and Del." ],
       "ru": [ "Попробуйте стереть выбранный регион, если это возможно,\r\n"
             , "отправив последовательность Del/BS на консоль.\r\n"
-            , "Реализуйте ‘обычные’ горячие клавиши Ctrl+X, Shift+Del, BS и Del." ],
+            , "Реализуйте ‘обычные’ хоткеи Ctrl+X, Shift+Del, BS и Del." ],
       "zh": [ "如果可能，尝试擦除选择的区域\r\n"
             , "由发送系列的 Del/BS 键至控制台。\r\n"
             , "实现“通常意义的”热键 Ctrl+X、Shift+Del、BS 和 Del。" ],
@@ -1792,9 +1792,9 @@
       "ru": "Обрабатывать последовательности ANSI. Для дочерних процессов (например, cmd.exe → app.exe) нужна опция «Внедрить ConEmuHk».",
       "zh": "启用 ANSI 转义序列的处理，如果你想调用第二层次的进程（比如：cmd.exe -> app.exe），‘注入 ConEmuHk’ 必须被选中",
       "de": "Verarbeitung von ANSI-Escape-Sequenzen aktivieren, 'ConEmuHk einschleusen' muss ausgewählt sein wenn mit Prozessen zweiter Ebenen gearbeitet werden soll (z.B. cmd.exe -> app.exe)",
-      "ja": "ANSIエスケープシーケンスの処理を有効にする,2番目のレベルのプロセス(cmd.exe  -> app.exeなど)を使用する場合は, 'Inject ConEmuHk'をオンにする必要があります.",
+      "ja": "ANSIエスケープシーケンスの処理を有効にする,2番目のレベルのプロセス(cmd.exe -> app.exeなど)を使用する場合は, 'Inject ConEmuHk'をオンにする必要があります.",
       "es": "Permitir procesar las secuencias de escape ANSI, debe estar seleccionado 'Inyectar ConEmuHk' para que funcione con procesos de segundo nivel (ej.: cmd.exe -> app.exe)",
-      "pl": "Włącz przetwarzanie sekwencji ucieczki ANSI, \"Inject ConEmuHk” musi być zaznaczone, jeśli chcesz pracować z procesami drugiego poziomu (np. Cmd.exe -> app.exe)",
+      "pl": "Włącz przetwarzanie sekwencji ucieczki ANSI, ‘Inject ConEmuHk’ musi być zaznaczone, jeśli chcesz pracować z procesami drugiego poziomu (np. Cmd.exe -> app.exe)",
       "ko": "ANSI 이스케이프 시퀀스 처리를 활성화합니다. 두 번째 수준 프로세스 (예: cmd.exe -> app.exe)로 작업하려면 ‘ConEmuHk 삽입’을 선택해야 합니다",
       "ko_KR": "ANSI 이스케이프 시퀀스 처리를 활성화합니다. 두 번째 수준 프로세스 (예: cmd.exe -> app.exe)로 작업하려면 ‘ConEmuHk 삽입’을 선택해야 합니다",
       "id": 2253 }
@@ -5896,7 +5896,7 @@
     ,
     "vkMinimizeRestore": {
       "en": "Minimize/Restore (Quake-style hotkey also)",
-      "ru": "Свернуть/Восстановить (также горячая клавиша в Quake-style)",
+      "ru": "Свернуть/восстановить (также хоткей в режиме Quake)",
       "zh": "最小化/恢复（Quake式热键）",
       "de": "Minimieren/Wiederherstellen (auch Quake-Tastenkürzel)",
       "ja": "最小化/復元(Quakeスタイルのホットキーも可能)",
@@ -6770,7 +6770,7 @@
     ,
     "vkWinAltK": {
       "en": "Setup ‘Hotkeys’",
-      "ru": "Настроить ‘Горячие клавиши’",
+      "ru": "Настроить ‘Хоткеи’",
       "zh": "注册 ‘热键’",
       "de": "Einrichtung 'Kürzel'",
       "ja": "セットアップ 'ホットキー'",
@@ -13400,7 +13400,7 @@
     ,
     "gbCtrlIntercept": {
       "en": "Hotkeys processing",
-      "ru": "Обработка горячих клавиш",
+      "ru": "Обработка хоткеев",
       "_zh": "拦截按键",
       "de": "Tastenkürzel verarbeiten",
       "ja": "ホットキー処理",
@@ -14010,7 +14010,7 @@
     ,
     "gbSelectKeyboard": {
       "en": "Select text with keyboard (Also there are two hotkeys on Keys&Macro page)",
-      "ru": "Выделите текст с помощью клавиатуры (также есть две горячие клавиши на странице ‘Клавиши и макро’)",
+      "ru": "Выделение с клавиатуры (см. также два хоткея на странице «Хоткеи и макросы»)",
       "zh": "使用键盘选择文本（Keys&Macro页面也有两个热键）",
       "de": "Text per Tastatur auswählen (Es gibt auch zwei Tastenkürzel auf der Seite \"Tasten&Makros\")",
       "ja": "キーボードでテキストを選択 (Keys&Macro ページには2つのホットキーもあります)",
