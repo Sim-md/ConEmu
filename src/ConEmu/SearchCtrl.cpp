@@ -215,7 +215,10 @@ static LRESULT EditIconHintPaint(HWND hEditCtrl, CEIconHintInfo* p, UINT Msg = W
 			HBRUSH hBr = reinterpret_cast<HBRUSH>(SendMessage(GetParent(hEditCtrl),
 				WM_CTLCOLOREDIT, reinterpret_cast<WPARAM>(hdc), reinterpret_cast<LPARAM>(hEditCtrl)));
 			if (!hBr) hBr = GetSysColorBrush(COLOR_WINDOW);
-			const bool darkEdit = global::g_darkModeEnabled && GetBkColor(hdc) == DarkMode::Control;
+			const auto editBackground = GetBkColor(hdc);
+			const bool darkEdit = global::g_darkModeEnabled && editBackground == DarkMode::Control;
+			const bool coloredEdit = hBr == GetStockObject(DC_BRUSH) && editBackground != GetSysColor(COLOR_WINDOW);
+			const auto hintColor = darkEdit ? DarkMode::Hint : coloredEdit ? GetTextColor(hdc) : p->clrHint;
 			RECT rcFill = rect;
 			// Draw only icon?
 			if (!bDrawHint)
@@ -237,9 +240,9 @@ static LRESULT EditIconHintPaint(HWND hEditCtrl, CEIconHintInfo* p, UINT Msg = W
 				int X1 = rcClient.right - iw - 1;
 				int Y1 = std::max<int>(0,((rcClient.bottom-rcClient.top-ih)/2));
 
-				if (darkEdit)
+				if (darkEdit || coloredEdit)
 				{
-					HPEN pen = CreatePen(PS_SOLID, std::max(1, ih / 12), DarkMode::Hint);
+					HPEN pen = CreatePen(PS_SOLID, std::max(1, ih / 12), hintColor);
 					HGDIOBJ oldPen = SelectObject(hdc, pen);
 					HGDIOBJ oldBrush = SelectObject(hdc, GetStockObject(NULL_BRUSH));
 					const int diameter = ih * 2 / 3;
@@ -260,7 +263,7 @@ static LRESULT EditIconHintPaint(HWND hEditCtrl, CEIconHintInfo* p, UINT Msg = W
 				rect.bottom--;
 				HFONT hOldFont = (HFONT)SelectObject(hdc, dh.hFont);
 				COLORREF OldColor = GetTextColor(hdc);
-				SetTextColor(hdc, darkEdit ? DarkMode::Hint : p->clrHint);
+				SetTextColor(hdc, hintColor);
 				const int oldBkMode = SetBkMode(hdc, TRANSPARENT);
 				DrawText(hdc, p->sHint, -1, &rect, DT_LEFT|DT_SINGLELINE|DT_EDITCONTROL|DT_VCENTER);
 				SetBkMode(hdc, oldBkMode);

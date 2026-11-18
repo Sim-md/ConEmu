@@ -50,7 +50,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ToolImg.h"
 #include "VConGroup.h"
 #include "../common/WUser.h"
-#include <cmath>
 
 //WNDPROC CTabPanelWin::_defaultTabProc = nullptr;
 //WNDPROC CTabPanelWin::_defaultToolProc = nullptr;
@@ -71,16 +70,6 @@ struct TabPalette
 	COLORREF strip, inactive, active, text, activeText, stripText;
 };
 
-static COLORREF ContrastingText(COLORREF background)
-{
-	const auto linear = [](double channel) {
-		channel /= 255.0;
-		return channel <= 0.04045 ? channel / 12.92 : std::pow((channel + 0.055) / 1.055, 2.4);
-	};
-	const double luminance = 0.2126 * linear(GetRValue(background))
-		+ 0.7152 * linear(GetGValue(background)) + 0.0722 * linear(GetBValue(background));
-	return luminance >= 0.179 ? RGB(0, 0, 0) : RGB(255, 255, 255);
-}
 
 static TabPalette GetTabPalette()
 {
@@ -94,7 +83,8 @@ static TabPalette GetTabPalette()
 		const auto accent = CDwmHelper::WindowsAccentColor();
 		const auto inactive = CDwmHelper::BlendColors(accent, dark ? RGB(0, 0, 0) : RGB(255, 255, 255), 20);
 		const auto active = CDwmHelper::BlendColors(accent, dark ? RGB(255, 255, 255) : RGB(0, 0, 0), 35);
-		return {accent, inactive, active, ContrastingText(inactive), ContrastingText(active), ContrastingText(accent)};
+		return {accent, inactive, active, CDwmHelper::ContrastingText(inactive),
+			CDwmHelper::ContrastingText(active), CDwmHelper::ContrastingText(accent)};
 	}
 	if (dark)
 		return {DarkMode::Background, RGB(38, 38, 38), DarkMode::Control,
@@ -149,7 +139,7 @@ static void PaintConsoleTabs(HWND tabs, HDC dc)
 	const auto alternate = highContrast ? GetSysColor(COLOR_WINDOW)
 		: CDwmHelper::BlendColors(colors.inactive, colors.text, 7);
 	const auto alternateText = highContrast ? GetSysColor(COLOR_WINDOWTEXT)
-		: ContrastingText(alternate);
+		: CDwmHelper::ContrastingText(alternate);
 	POINT cursor = {};
 	GetCursorPos(&cursor);
 	ScreenToClient(tabs, &cursor);
@@ -181,7 +171,7 @@ static void PaintConsoleTabs(HWND tabs, HDC dc)
 			? CDwmHelper::BlendColors(normal, colors.active, 50) : DarkMode::Hover;
 		const auto background = isSelected ? colors.active : hovered ? hover : normal;
 		const auto foreground = isSelected ? colors.activeText
-			: hovered ? ContrastingText(background) : (i % 2 == 0 ? colors.text : alternateText);
+			: hovered ? CDwmHelper::ContrastingText(background) : (i % 2 == 0 ? colors.text : alternateText);
 		SetDCBrushColor(dc, background);
 		FillRect(dc, &item, brush);
 		if (isSelected || (info.dwState & TCIS_HIGHLIGHTED))
@@ -361,7 +351,7 @@ static void PaintConsoleToolbar(HWND toolbar, HDC dc)
 			: hovered && !pressed && !checked && gpSet && gpSet->isTabsUseWindowsAccent && !CDwmHelper::IsHighContrast()
 				? CDwmHelper::BlendColors(colors.strip, colors.active, 55) : colors.active;
 		const auto foreground = enabled || !dark
-			? (highlighted ? ContrastingText(background) : colors.stripText)
+			? (highlighted ? CDwmHelper::ContrastingText(background) : colors.stripText)
 			: CDwmHelper::BlendColors(background, colors.stripText, 50);
 		if (highlighted)
 			FillRect(dc, &item, DarkMode::Brush(dc, background));

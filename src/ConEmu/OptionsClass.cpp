@@ -1755,9 +1755,8 @@ LRESULT CSettings::OnPage(LPNMHDR phdr)
 
 HWND CSettings::SettingsDialogOwner()
 {
-	// A topmost owner would also make its owned Settings window topmost.
-	return ghWnd && !(GetWindowLongPtr(ghWnd, GWL_STYLE) & WS_CHILD)
-		&& !(GetWindowLongPtr(ghWnd, GWL_EXSTYLE) & WS_EX_TOPMOST) ? ghWnd : nullptr;
+	// Keep Settings above ConEmu, including when its owner becomes topmost.
+	return ghWnd && !(GetWindowLongPtr(ghWnd, GWL_STYLE) & WS_CHILD) ? ghWnd : nullptr;
 }
 
 /// IdShowPage is DialogID (IDD_SPG_FONTS, etc.)

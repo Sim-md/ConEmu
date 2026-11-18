@@ -36,6 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ConEmu.h"
 #include "Options.h"
 #include "IatHook.h"
+#include <cmath>
 
 
 
@@ -472,6 +473,17 @@ COLORREF CDwmHelper::BlendColors(COLORREF base, COLORREF tint, unsigned tintPerc
 	};
 	return RGB(blend(GetRValue(base), GetRValue(tint)), blend(GetGValue(base), GetGValue(tint)),
 		blend(GetBValue(base), GetBValue(tint)));
+}
+
+COLORREF CDwmHelper::ContrastingText(COLORREF background)
+{
+	const auto linear = [](double channel) {
+		channel /= 255.0;
+		return channel <= 0.04045 ? channel / 12.92 : std::pow((channel + 0.055) / 1.055, 2.4);
+	};
+	const double luminance = 0.2126 * linear(GetRValue(background))
+		+ 0.7152 * linear(GetGValue(background)) + 0.0722 * linear(GetBValue(background));
+	return luminance >= 0.179 ? RGB(0, 0, 0) : RGB(255, 255, 255);
 }
 
 bool CDwmHelper::IsThemed()

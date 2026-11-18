@@ -173,6 +173,7 @@ public:
 	static bool IsWindowsDarkMode();
 	static COLORREF WindowsAccentColor();
 	static COLORREF BlendColors(COLORREF base, COLORREF tint, unsigned tintPercent);
+	static COLORREF ContrastingText(COLORREF background);
 	void ApplyPopupMenuTheme(HWND owner);
 	void EnableDarkCaption(HWND window);
 	void EnableGlass(bool abGlass);

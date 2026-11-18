@@ -227,23 +227,26 @@ LRESULT CFindPanel::FindPaneProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		break;
 	case WM_CTLCOLOREDIT:
 	case WM_CTLCOLORSTATIC:
-		if (global::g_darkModeEnabled)
-		{
-			HDC dc = reinterpret_cast<HDC>(wParam);
-			SetTextColor(dc, DarkMode::Text);
-			SetBkColor(dc, DarkMode::Control);
-			return reinterpret_cast<LRESULT>(DarkMode::Brush(dc, DarkMode::Control));
-		}
-		break;
 	case WM_ERASEBKGND:
-		if (global::g_darkModeEnabled)
+	{
+		const bool accent = gpSet->isTabsUseWindowsAccent && !CDwmHelper::IsHighContrast();
+		if (!accent && !global::g_darkModeEnabled)
+			break;
+		const HDC dc = reinterpret_cast<HDC>(wParam);
+		const auto strip = accent ? CDwmHelper::WindowsAccentColor() : DarkMode::Background;
+		if (uMsg == WM_ERASEBKGND)
 		{
 			GetClientRect(hWnd, &rcClient);
-			FillRect(reinterpret_cast<HDC>(wParam), &rcClient,
-				DarkMode::Brush(reinterpret_cast<HDC>(wParam), DarkMode::Background));
+			FillRect(dc, &rcClient, DarkMode::Brush(dc, strip));
 			return 1;
 		}
-		break;
+		const auto background = accent
+			? CDwmHelper::BlendColors(strip, global::g_darkModeEnabled ? RGB(0, 0, 0) : RGB(255, 255, 255), 20)
+			: DarkMode::Control;
+		SetTextColor(dc, accent ? CDwmHelper::ContrastingText(background) : DarkMode::Text);
+		SetBkColor(dc, background);
+		return reinterpret_cast<LRESULT>(DarkMode::Brush(dc, background));
+	}
 	case WM_CREATE:
 		if (!pPanel || !((CFindPanel*)((CREATESTRUCT*)lParam)->lpCreateParams)->OnCreate((CREATESTRUCT*)lParam))
 		{
@@ -563,7 +566,7 @@ void CFindPanel::Invalidate()
 {
 	// #SIZE_TODO When caption is hidden, the search field is not painted properly on startup when `-detached`
 	if (mh_Pane)
-		::InvalidateRect(mh_Pane, nullptr, FALSE);
+		::InvalidateRect(mh_Pane, nullptr, TRUE);
 	if (mh_Edit)
 		::InvalidateRect(mh_Edit, nullptr, FALSE);
 }
