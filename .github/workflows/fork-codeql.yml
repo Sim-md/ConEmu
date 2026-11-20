@@ -22,7 +22,7 @@ jobs:
       matrix:
         language: [c-cpp, python]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: ${{ matrix.language == 'c-cpp' && 'recursive' || 'false' }}
           persist-credentials: false

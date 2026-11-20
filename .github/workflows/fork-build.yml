@@ -1,9 +1,18 @@
 name: Fork build and tests
+# Keep the fallback version in sync with src/ConEmu/version.h.
+# Release commits can supply their own headline as "Release YYMMDD: summary".
+run-name: >-
+  ${{ startsWith(github.event.head_commit.message, 'Release ') && github.event.head_commit.message
+    || format('ConEmu 261120: {0}', inputs.summary || github.event.head_commit.message || 'Manual build and tests') }}
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      summary:
+        description: Short description of the changes under test
+        type: string
 
 permissions:
   contents: read
@@ -27,11 +36,11 @@ jobs:
             suffix: '64'
             machine: 8664
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
           persist-credentials: false
-      - uses: microsoft/setup-msbuild@v2
+      - uses: microsoft/setup-msbuild@v3
       - name: Build
         run: >
           msbuild src/CE.sln /m:3 /v:minimal
@@ -45,7 +54,7 @@ jobs:
           $bytes = [IO.File]::ReadAllBytes((Resolve-Path './Release/ConEmu${{ matrix.suffix }}.exe').Path)
           $machine = '{0:X4}' -f [BitConverter]::ToUInt16($bytes, [BitConverter]::ToInt32($bytes, 60) + 4)
           if ($machine -ne '${{ matrix.machine }}') { throw "Unexpected PE machine: $machine" }
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ matrix.arch }}
           path: |
@@ -66,7 +75,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
           persist-credentials: false
@@ -102,7 +111,7 @@ jobs:
           aarch64-w64-mingw32-clang++ -std=c++17 -O1 -static -municode "$sources/ConPtyHistoryChild.cpp" -o Release-arm64/tests/HistoryChild.exe
           aarch64-w64-mingw32-clang++ -std=c++17 -O2 -static -municode .github/scripts/fork-update-hook-probe.cpp -o Release-arm64/tests/HookCheck.exe
           tar -cf "$RUNNER_TEMP/arm64-ci.tar" -C Release-arm64 package tests
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: arm64-ci
           path: ${{ runner.temp }}/arm64-ci.tar
@@ -115,7 +124,7 @@ jobs:
     runs-on: windows-11-arm
     timeout-minutes: 10
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: arm64-ci
       - name: Run ConPTY regressions
@@ -138,10 +147,10 @@ jobs:
     outputs:
       tag: ${{ steps.package.outputs.tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           path: artifacts
       - name: Package and verify release ZIPs
@@ -152,7 +161,7 @@ jobs:
           tag="ci-${GITHUB_SHA:0:7}-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           python3 .github/scripts/package-fork-release.py artifacts dist "$GITHUB_SHA" "$tag"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: packaged-release
           path: dist/*
@@ -173,10 +182,10 @@ jobs:
           - arch: arm64
             runner: windows-11-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: packaged-release
           path: dist
@@ -186,7 +195,7 @@ jobs:
         run: |
           for /f "usebackq delims=" %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do call "%%i\Common7\Tools\VsDevCmd.bat" -arch=${{ matrix.arch }} -host_arch=x64
           cl /nologo /O2 /MT /Fe:"%RUNNER_TEMP%\HookCheck.exe" .github\scripts\fork-update-hook-probe.cpp
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         if: matrix.arch == 'arm64'
         with:
           name: arm64-ci
@@ -211,26 +220,36 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: packaged-release
           path: dist
       - name: Publish latest release
+        id: publish
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.package.outputs.tag }}
         run: |
           tag="$TAG"
           version=$(sed -n 's/^version=//p' dist/version.ini | head -n 1)
+          published=$(gh api "repos/$GITHUB_REPOSITORY/contents/version.ini?ref=update-feed-v2" \
+            -H 'Accept: application/vnd.github.raw+json' | sed -n 's/^version=//p' | sort -u)
+          [[ $published =~ ^[0-9]{6}[a-z]?$ ]]
+          if [[ $version == "$published" || $version < "$published" ]]; then
+            echo "ConEmu $published is already available in the update channel. Skipping publication for $version."
+            exit 0
+          fi
           gh release create "$tag" --target "$GITHUB_SHA" --draft --latest=false \
             --title "ConEmu $version (${GITHUB_SHA:0:7})" \
             --notes "ARM64, x86 and x64 builds from $GITHUB_SHA. All jobs passed in $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID. SHA-256 sums are in SHA256SUMS.txt."
           gh release upload "$tag" dist/*.zip dist/SHA256SUMS.txt dist/version.ini
           gh release edit "$tag" --draft=false --prerelease=false --latest
+          echo 'published=true' >> "$GITHUB_OUTPUT"
       - name: Publish version.ini for installed copies
+        if: steps.publish.outputs.published == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
